@@ -1,3 +1,20 @@
+create table admin_users
+(
+    id                bigint unsigned auto_increment
+        primary key,
+    name              varchar(255)      not null,
+    email             varchar(255)      not null,
+    email_verified_at timestamp         null,
+    password          varchar(255)      not null,
+    nivel_acceso      tinyint default 1 null,
+    remember_token    varchar(100)      null,
+    created_at        timestamp         null,
+    updated_at        timestamp         null,
+    constraint email
+        unique (email)
+)
+    collate = utf8mb4_unicode_ci;
+
 create table cache
 (
     `key`      varchar(255) not null
@@ -98,10 +115,11 @@ create table migrations
 
 create table niveles_academicos
 (
-    id     bigint auto_increment
+    id                    bigint auto_increment
         primary key,
-    nombre varchar(50)          not null,
-    estado tinyint(1) default 1 null
+    nombre                varchar(50)          not null,
+    estado                tinyint(1) default 1 null,
+    requiere_especialidad tinyint(1) default 0 null
 );
 
 create table niveles_experiencia
@@ -128,6 +146,54 @@ create table secciones
     nombre     varchar(100)         not null,
     estado     tinyint(1) default 1 null
 );
+
+create table plazas
+(
+    id_plaza                 bigint auto_increment
+        primary key,
+    titulo                   varchar(200)                         not null,
+    alias_plaza              varchar(200)                         null,
+    id_seccion               bigint                               null,
+    id_categoria             bigint                               null,
+    publicado                tinyint(1) default 0                 null,
+    estado                   tinyint                              not null,
+    pagina_principal         tinyint(1) default 0                 null,
+    id_autor                 bigint                               null,
+    user_id                  bigint unsigned                      null,
+    alias_autor              varchar(50)                          null,
+    id_nivel_acceso          bigint                               null,
+    created_at               datetime   default CURRENT_TIMESTAMP null,
+    updated_at               datetime                             null on update CURRENT_TIMESTAMP,
+    fecha_inicio_publicacion date                                 null,
+    fecha_fin_publicacion    date                                 null,
+    contenido_html           longtext                             null,
+    accesos                  int        default 0                 null,
+    deleted_at               datetime                             null,
+    constraint fk_plazas_users
+        foreign key (user_id) references admin_users (id),
+    constraint plazas_ibfk_1
+        foreign key (id_seccion) references secciones (id_seccion),
+    constraint plazas_ibfk_2
+        foreign key (id_categoria) references categorias (id_categoria)
+);
+
+create index id_autor
+    on plazas (id_autor);
+
+create index id_categoria
+    on plazas (id_categoria);
+
+create index id_nivel_acceso
+    on plazas (id_nivel_acceso);
+
+create index id_seccion
+    on plazas (id_seccion);
+
+create index idx_plazas_busqueda
+    on plazas (titulo, alias_plaza);
+
+create index idx_plazas_fechas
+    on plazas (fecha_inicio_publicacion, fecha_fin_publicacion);
 
 create table sessions
 (
@@ -174,67 +240,19 @@ create table users
 (
     id                bigint unsigned auto_increment
         primary key,
-    name              varchar(255)                                    not null,
-    email             varchar(255)                                    not null,
-    role              enum ('admin', 'aspirante') default 'aspirante' not null,
-    id_perfil         bigint                                          null,
-    email_verified_at timestamp                                       null,
-    password          varchar(255)                                    not null,
-    remember_token    varchar(100)                                    null,
-    created_at        timestamp                                       null,
-    updated_at        timestamp                                       null,
+    name              varchar(255)                           not null,
+    email             varchar(255)                           not null,
+    role              enum ('aspirante') default 'aspirante' not null,
+    id_perfil         bigint                                 null,
+    email_verified_at timestamp                              null,
+    password          varchar(255)                           not null,
+    remember_token    varchar(100)                           null,
+    created_at        timestamp                              null,
+    updated_at        timestamp                              null,
     constraint users_email_unique
         unique (email)
 )
     collate = utf8mb4_unicode_ci;
-
-create table plazas
-(
-    id_plaza                 bigint auto_increment
-        primary key,
-    titulo                   varchar(200)                         not null,
-    alias_plaza              varchar(200)                         null,
-    id_seccion               bigint                               null,
-    id_categoria             bigint                               null,
-    publicado                tinyint(1) default 0                 null,
-    estado                   tinyint                              not null,
-    pagina_principal         tinyint(1) default 0                 null,
-    id_autor                 bigint                               null,
-    user_id                  bigint unsigned                      null,
-    alias_autor              varchar(50)                          null,
-    id_nivel_acceso          bigint                               null,
-    created_at               datetime   default CURRENT_TIMESTAMP null,
-    updated_at               datetime                             null on update CURRENT_TIMESTAMP,
-    fecha_inicio_publicacion date                                 null,
-    fecha_fin_publicacion    date                                 null,
-    contenido_html           longtext                             null,
-    accesos                  int        default 0                 null,
-    deleted_at               datetime                             null,
-    constraint fk_plazas_users
-        foreign key (user_id) references users (id),
-    constraint plazas_ibfk_1
-        foreign key (id_seccion) references secciones (id_seccion),
-    constraint plazas_ibfk_2
-        foreign key (id_categoria) references categorias (id_categoria)
-);
-
-create index id_autor
-    on plazas (id_autor);
-
-create index id_categoria
-    on plazas (id_categoria);
-
-create index id_nivel_acceso
-    on plazas (id_nivel_acceso);
-
-create index id_seccion
-    on plazas (id_seccion);
-
-create index idx_plazas_busqueda
-    on plazas (titulo, alias_plaza);
-
-create index idx_plazas_fechas
-    on plazas (fecha_inicio_publicacion, fecha_fin_publicacion);
 
 create table usuario_perfil
 (
@@ -325,5 +343,3 @@ create index id_nivel_academico
 
 create index idx_aspirantes_nombre
     on usuario_perfil (nombre_completo);
-
-
