@@ -95,8 +95,18 @@ class PlazaController extends Controller
         
         $plaza = new Plaza();
         $plaza->fill($this->preparePlazaData($validatedData));
-        $plaza->user_id = auth()->id();  // Usar user_id en lugar de id_autor
-        $plaza->alias_autor = auth()->user()->name;
+        
+        // Verificar si el usuario autenticado es un administrador
+        if (auth()->guard('admin')->check()) {
+            $admin = auth()->guard('admin')->user();
+            $plaza->user_id = $admin->id;
+            $plaza->alias_autor = $admin->name;
+        } else {
+            $user = auth()->user();
+            $plaza->user_id = $user->id;
+            $plaza->alias_autor = $user->name;
+        }
+        
         $plaza->save();
     
         return redirect()->back()
@@ -109,8 +119,10 @@ class PlazaController extends Controller
         
         $plaza = Plaza::findOrFail($id);
         $plaza->fill($this->preparePlazaData($validatedData));
+        
+        
         $plaza->save();
-
+    
         return redirect()->back()
             ->with('message', 'Plaza actualizada exitosamente');
     }

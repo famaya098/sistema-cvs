@@ -4,6 +4,7 @@ import { ref, watch } from 'vue';
 import debounce from 'lodash/debounce';
 import { Head, Link, router } from '@inertiajs/vue3';
 
+import FlashMessages from '@/Components/FlashMessages.vue';
 const props = defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
@@ -50,6 +51,9 @@ const clearFilters = () => {
     <Head title="Bienvenido" />
     <GuestLayout>
         <div class="bg-gradient-to-b from-[#363d4d] to-[#2c3340] min-h-screen">
+            <!-- Reemplazar los mensajes de alerta por el componente -->
+            <FlashMessages />
+            
             <!-- Header Section -->
             <div class="container mx-auto px-4 pt-8 pb-16">
                 <div class="flex flex-col items-center mb-8 relative">
@@ -63,16 +67,50 @@ const clearFilters = () => {
                     </div>
                     
                     <!-- Botones de login/register en la esquina superior derecha -->
+                    <!-- Botones de login/register en la esquina superior derecha -->
                     <nav v-if="canLogin" class="flex gap-3 absolute top-0 right-0 md:right-4">
-                        <Link
-                            v-if="$page.props.auth.user"
-                            :href="route('dashboard')"
-                            class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
-                        >
-                            Dashboard
-                        </Link>
-
+                        <template v-if="$page.props.auth.user">
+                            <!-- Usuario autenticado (aspirante) -->
+                            <div class="flex items-center gap-2 px-4 py-2 text-white">
+                                <span class="text-sm">{{ $page.props.auth.user.name }}</span>
+                                <Link
+                                    :href="route('aspirante.perfil')"
+                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
+                                >
+                                    Mi Perfil
+                                </Link>
+                                <Link
+                                    :href="route('logout')"
+                                    method="post"
+                                    as="button"
+                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
+                                >
+                                    Cerrar Sesión
+                                </Link>
+                            </div>
+                        </template>
+                        <template v-else-if="$page.props.auth.admin">
+                            <!-- Administrador autenticado -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-white">Admin: {{ $page.props.auth.admin.name }}</span>
+                                <Link
+                                    :href="route('plazas.index')"
+                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
+                                >
+                                    Panel Admin
+                                </Link>
+                                <Link
+                                    :href="route('admin.logout')"
+                                    method="post"
+                                    as="button"
+                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
+                                >
+                                    Cerrar Sesión
+                                </Link>
+                            </div>
+                        </template>
                         <template v-else>
+                            <!-- Usuario no autenticado -->
                             <Link
                                 :href="route('login')"
                                 class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
@@ -81,8 +119,8 @@ const clearFilters = () => {
                             </Link>
 
                             <Link
-                            v-if="canRegister"
-                            :href="route('registro.aspirante')"
+                                v-if="canRegister"
+                                :href="route('registro.aspirante')"
                                 class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
                             >
                                 Registrarse
@@ -200,6 +238,7 @@ const clearFilters = () => {
                 </div>
             </div>
         </div>
+        
     </GuestLayout>
 </template>
 

@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PlazaController;
+use App\Http\Controllers\Admin\AdminAuthController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Storage;
 
 // Ruta pública (página de inicio)
@@ -26,28 +26,53 @@ Route::get('/', function (Request $request) {
     ]);
 })->name('welcome');
 
-// Ruta pública para ver detalles de una plaza
-Route::get('/plazas/{plaza}/show', [PlazaController::class, 'showPublic'])
-    ->name('plazas.show.public');
+// Rutas específicas para administradores (login, logout)
+// Nota: La URL del login de admin está oculta con un nombre secreto
+Route::middleware('guest:admin')->group(function () {
+    Route::get('/bcr-admin', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/bcr-admin', [AdminAuthController::class, 'login']);
+});
 
-// Rutas que requieren autenticación
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
+Route::middleware('admin')->group(function () {
+    Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+    
+    // Dashboard administrativo
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    // Rutas para el perfil
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Rutas para la gestión de plazas 
+    // Rutas para la gestión de plazas
     Route::resource('plazas', PlazaController::class);
+});
 
-    // Ruta para aplicar a una plaza
-    Route::post('/plazas/{plaza}/apply', [PlazaController::class, 'apply'])
-        ->name('plazas.apply');
+// Ruta pública para ver detalles de una plaza
+Route::get('/plazas/{plaza}/show', [PlazaController::class, 'showPublic'])
+    ->name('plazas.show.public');
+
+// Rutas para aspirantes autenticados
+Route::middleware(['auth:web'])->group(function () {
+    // ... rutas existentes ...
+    
+    // Rutas para el perfil del aspirante
+    Route::get('/aspirante/perfil', [App\Http\Controllers\AspirantePerfilController::class, 'show'])
+        ->name('aspirante.perfil');
+    Route::post('/aspirante/perfil/info', [App\Http\Controllers\AspirantePerfilController::class, 'updateInfo'])
+        ->name('aspirante.perfil.info');
+    Route::post('/aspirante/perfil/password', [App\Http\Controllers\AspirantePerfilController::class, 'updatePassword'])
+        ->name('aspirante.perfil.password');
+    Route::get('/aspirante/perfil/cv/download', [App\Http\Controllers\AspirantePerfilController::class, 'downloadCV'])
+        ->name('aspirante.perfil.cv.download');
+    Route::post('/aspirante/perfil/cv/update', [App\Http\Controllers\AspirantePerfilController::class, 'updateCV'])
+        ->name('aspirante.perfil.cv.update');
+});
+
+// Rutas para el registro extendido de aspirantes
+Route::middleware('guest:web')->group(function () {
+    Route::get('/registro-aspirante', [App\Http\Controllers\AspiranteRegistroController::class, 'create'])
+        ->name('registro.aspirante');
+
+    Route::post('/registro-aspirante', [App\Http\Controllers\AspiranteRegistroController::class, 'store'])
+        ->name('registro.aspirante.store');
 });
 
 Route::get('/test-s3-connection', function() {
@@ -69,22 +94,5 @@ Route::get('/test-s3-connection', function() {
         ];
     }
 });
-
-// Rutas para el registro extendido de aspirantes
-Route::middleware('guest')->group(function () {
-    Route::get('/registro-aspirante', [App\Http\Controllers\AspiranteRegistroController::class, 'create'])
-        ->name('registro.aspirante');
-
-    Route::post('/registro-aspirante', [App\Http\Controllers\AspiranteRegistroController::class, 'store'])
-        ->name('registro.aspirante.store');
-});
-
-Route::get('/registro-test', function () {
-    return Inertia::render('Auth/RegisterExtended', [
-        'nivelesAcademicos' => [],
-        'estadosAcademicos' => [],
-        'nivelesExperiencia' => [],
-    ]);
-})->name('registro.test');
 
 require __DIR__.'/auth.php';

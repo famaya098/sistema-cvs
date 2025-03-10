@@ -18,6 +18,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
+        // Si ya hay un aspirante autenticado, redirigir a la bienvenida
+        if (Auth::guard('web')->check()) {
+            return redirect()->route('welcome');
+        }
+        
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
@@ -29,11 +34,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Modificamos el método authenticate en LoginRequest 
+        // para que solo intente autenticar en la guarda 'web'
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirigir al aspirante a la página de bienvenida en lugar del dashboard
+        return redirect()->route('welcome');
     }
 
     /**

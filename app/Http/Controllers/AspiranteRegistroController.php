@@ -156,11 +156,16 @@ class AspiranteRegistroController extends Controller
             
             // Confirmar transacción
             DB::commit();
+
+            // Actualizar el id_perfil en la tabla users
+            $user->id_perfil = $perfil->id_aspirante;
+            $user->save();
             
             // Iniciar sesión automáticamente
             Auth::login($user);
             
-            return redirect()->route('dashboard')->with('message', 'Registro completado exitosamente');
+            // Redireccionar al usuario a la página de bienvenida con mensaje de éxito
+            return redirect()->route('welcome')->with('success', 'Registro completado exitosamente');
             
         } catch (\Exception $e) {
             // Revertir transacción en caso de error

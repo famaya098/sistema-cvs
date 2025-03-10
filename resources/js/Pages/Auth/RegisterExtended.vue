@@ -452,7 +452,7 @@ const submit = () => {
                                                 type="text"
                                                 v-model="form.especialidad"
                                                 class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent dark:text-white transition"
-                                                placeholder="Ej: Administración de Empresas, Finanzas"
+                                                placeholder="Ej: Maestría en Admón. de Empresas, Doctorado en Finanzas, etc"
                                                 :required="requiereEspecialidad"
                                             />
                                             <InputError class="mt-1" :message="form.errors.especialidad" />
