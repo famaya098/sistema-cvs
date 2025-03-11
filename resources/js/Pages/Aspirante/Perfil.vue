@@ -215,7 +215,11 @@ watch(() => infoForm.id_nivel_academico, (newValue) => {
                     <div class="bg-white dark:bg-[#303844] rounded-xl shadow-xl overflow-hidden">
                         <!-- Información Personal -->
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-4">Información Personal</h3>
+
+                            <div class="text-center space-y-2 mb-8">
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Información Personal</h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Actualiza tu Infromación Personal, Contraseña o Curriculum</p>
+                            </div>
                             
                             <form @submit.prevent="submitInfoForm" class="space-y-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

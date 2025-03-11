@@ -170,21 +170,24 @@ class PlazaController extends Controller
         ];
     }
     public function showPublic($id)
-{
-    $plaza = Plaza::with(['seccion', 'categoria'])
-        ->where('publicado', true)
-        ->where('estado', true)
-        ->where('fecha_inicio_publicacion', '<=', now())
-        ->where('fecha_fin_publicacion', '>=', now())
-        ->findOrFail($id);
+    {
+        $plaza = Plaza::with(['seccion', 'categoria'])
+            ->where('publicado', true)
+            ->where('estado', true)
+            ->where('fecha_inicio_publicacion', '<=', now())
+            ->where('fecha_fin_publicacion', '>=', now())
+            ->findOrFail($id);
 
-    // Incrementar el contador de accesos
-    $plaza->increment('accesos');
+        // Incrementar el contador de accesos
+        $plaza->increment('accesos');
 
-    return Inertia::render('Public/Plazas/Show', [
-        'plaza' => $plaza
-    ]);
-}
+        // Verificar si hay errores en la consulta
+        \Log::info('Plaza encontrada: ', ['id' => $plaza->id_plaza, 'titulo' => $plaza->titulo]);
+
+        return Inertia::render('Public/Plazas/Show', [
+            'plaza' => $plaza
+        ]);
+    }
 
     
 }

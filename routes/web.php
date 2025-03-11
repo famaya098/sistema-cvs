@@ -23,6 +23,7 @@ Route::get('/', function (Request $request) {
         'secciones' => $plazasData['secciones'],
         'categorias' => $plazasData['categorias'],
         'filters' => $plazasData['filters'],
+        'scroll_top' => session('scroll_top', false),
     ]);
 })->name('welcome');
 
@@ -36,12 +37,12 @@ Route::middleware('guest:admin')->group(function () {
 Route::middleware('admin')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
     
-    // Dashboard administrativo
+    // Dashboard 
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    // Rutas para la gestión de plazas
+    // Ruta para la gestión de plazas
     Route::resource('plazas', PlazaController::class);
 });
 
@@ -51,7 +52,7 @@ Route::get('/plazas/{plaza}/show', [PlazaController::class, 'showPublic'])
 
 // Rutas para aspirantes autenticados
 Route::middleware(['auth:web'])->group(function () {
-    // ... rutas existentes ...
+    
     
     // Rutas para el perfil del aspirante
     Route::get('/aspirante/perfil', [App\Http\Controllers\AspirantePerfilController::class, 'show'])

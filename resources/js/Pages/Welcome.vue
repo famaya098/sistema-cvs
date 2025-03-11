@@ -4,12 +4,17 @@ import { ref, watch } from 'vue';
 import debounce from 'lodash/debounce';
 import { Head, Link, router } from '@inertiajs/vue3';
 
+import { onMounted } from 'vue';
+
 import FlashMessages from '@/Components/FlashMessages.vue';
+
 const props = defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
     plazas: Object,
     filters: Object,
+    scroll_top: Boolean,
+    flash: Object
 });
 
 const filterForm = ref({
@@ -45,12 +50,19 @@ const clearFilters = () => {
         search: '',
     };
 };
+
+onMounted(() => {
+    if (props.scroll_top || props.flash?.success) {
+        window.scrollTo(0, 0);
+    }
+});
+
 </script>
 
 <template>
     <Head title="Bienvenido" />
     <GuestLayout>
-        <div class="bg-gradient-to-b from-[#363d4d] to-[#2c3340] min-h-screen">
+        <div class="bg-gradient-to-b from-[#363d4d] to-[#2c3340] min-h-screen" id="top">
             <!-- Reemplazar los mensajes de alerta por el componente -->
             <FlashMessages />
             

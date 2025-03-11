@@ -14,6 +14,8 @@ const page = usePage();
 const isAdmin = computed(() => !!page.props.auth.admin);
 const currentUser = computed(() => isAdmin.value ? page.props.auth.admin : page.props.auth.user);
 const logoutRoute = computed(() => isAdmin.value ? 'admin.logout' : 'logout');
+
+
 </script>
 
 <template>

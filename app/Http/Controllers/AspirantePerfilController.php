@@ -161,6 +161,7 @@ class AspirantePerfilController extends Controller
         }
     }
     
+
     /**
      * Actualizar el CV
      */
@@ -178,20 +179,14 @@ class AspirantePerfilController extends Controller
         
         try {
             // Obtener el CV actual
-            $currentCV = UsuarioDocumento::with('documento')
+            $currentCVDocument = UsuarioDocumento::with('documento')
                 ->where('id_aspirante', $perfil->id_aspirante)
                 ->whereHas('documento.tipoDocumento', function ($query) {
                     $query->where('nombre', 'Curriculum Vitae');
                 })
                 ->where('activo', true)
                 ->first();
-                
-            // Desactivar el CV actual
-            if ($currentCV) {
-                $currentCV->activo = false;
-                $currentCV->save();
-            }
-            
+                    
             // Obtener el tipo de documento para CV
             $tipoDocumentoCV = TipoDocumento::where('nombre', 'Curriculum Vitae')->first();
             if (!$tipoDocumentoCV) {
@@ -209,23 +204,42 @@ class AspirantePerfilController extends Controller
             // Crear un nombre de archivo único para S3
             $filePath = 'curriculums/' . Str::uuid() . '.' . $file->getClientOriginalExtension();
             
-            // Subir archivo a S3
-            Storage::disk('s3')->put($filePath, file_get_contents($file));
-            
-            // Crear registro de documento
-            $documento = Documento::create([
-                'id_tipo_documento' => $tipoDocumentoCV->id,
-                'ruta' => $filePath,
-                'nombre_archivo' => $fileName,
-                'estado' => 1,
-            ]);
-            
-            // Asociar documento al usuario
-            UsuarioDocumento::create([
-                'id_aspirante' => $perfil->id_aspirante,
-                'id_documento' => $documento->id,
-                'activo' => 1,
-            ]);
+            if ($currentCVDocument) {
+                // Eliminar el archivo antiguo de S3
+                Storage::disk('s3')->delete($currentCVDocument->documento->ruta);
+                
+                // Actualizar el documento existente
+                $currentCVDocument->documento->update([
+                    'ruta' => $filePath,
+                    'nombre_archivo' => $fileName,
+                ]);
+                
+                // Mantener el mismo registro en usuario_documentos, asegurándonos que sigue activo
+                $currentCVDocument->activo = true;
+                $currentCVDocument->save();
+                
+                // Subir nuevo archivo a S3
+                Storage::disk('s3')->put($filePath, file_get_contents($file));
+            } else {
+                // Si no existe un CV previo, crear nuevo documento
+                // Subir archivo a S3
+                Storage::disk('s3')->put($filePath, file_get_contents($file));
+                
+                // Crear registro de documento
+                $documento = Documento::create([
+                    'id_tipo_documento' => $tipoDocumentoCV->id,
+                    'ruta' => $filePath,
+                    'nombre_archivo' => $fileName,
+                    'estado' => 1,
+                ]);
+                
+                // Asociar documento al usuario
+                UsuarioDocumento::create([
+                    'id_aspirante' => $perfil->id_aspirante,
+                    'id_documento' => $documento->id,
+                    'activo' => true,
+                ]);
+            }
             
             DB::commit();
             return redirect()->back()->with('success', 'CV actualizado correctamente');

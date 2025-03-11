@@ -56,13 +56,20 @@ const props = defineProps({
 
                             <!-- Botón de aplicar (solo visible para usuarios autenticados) -->
                             <div v-if="$page.props.auth.user" class="mt-8 flex justify-center">
-                                <Link
+                                <!-- <Link
                                     :href="route('plazas.apply', plaza.id_plaza)"
                                     class="px-6 py-3 text-sm font-medium text-white bg-[#363d4d] hover:bg-[#2c3340] rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#363d4d]"
                                 >
                                     <i class="fas fa-paper-plane mr-2"></i>
                                     Aplicar a esta plaza
-                                </Link>
+                                </Link> -->
+                                <button
+                                    @click="alert('Funcionalidad en desarrollo')"
+                                    class="px-6 py-3 text-sm font-medium text-white bg-[#363d4d] hover:bg-[#2c3340] rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#363d4d]"
+                                >
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Aplicar a esta plaza
+                                </button>
                             </div>
                             <div v-else class="mt-8 text-center">
                                 <p class="text-gray-500 dark:text-gray-400 mb-4">

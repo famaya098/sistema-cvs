@@ -152,6 +152,12 @@ const submit = () => {
     form.post(route('registro.aspirante.store'), {
         preserveScroll: true,
         onError: (errors) => {
+            // Desplazar hacia arriba cuando hay errores
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
             if (errors['g-recaptcha-response']) {
                 // Si hay un error con el captcha, reiniciarlo
                 window.grecaptcha?.reset();
@@ -159,6 +165,7 @@ const submit = () => {
         },
     });
 };
+
 </script>
 
 <template>
@@ -174,6 +181,9 @@ const submit = () => {
                     <p class="text-gray-300 text-sm">Banco Central de Reserva de El Salvador</p>
                 </div>
             </div>
+
+            
+            
 
             <!-- Register Card -->
             <div class="container mx-auto px-4 mb-8">
@@ -196,11 +206,25 @@ const submit = () => {
                             
 
                             <!-- -->
+
+                            
                             
                             <div class="text-center space-y-2 mb-8">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Crear Cuenta</h2>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Complete el formulario para registrarse como aspirante</p>
                             </div>
+
+                            <!-- le mostramos al usuario sus errores -->
+
+                            <div v-if="Object.keys(form.errors).length > 0" 
+                            class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                            <h3 class="text-red-600 dark:text-red-400 font-medium mb-2">Por favor corrige los siguientes errores:</h3>
+                            <ul class="list-disc list-inside text-sm text-red-600 dark:text-red-400">
+                                <li v-for="(error, key) in form.errors" :key="key">
+                                    {{ error }}
+                                </li>
+                            </ul>
+                        </div>
 
                             <form @submit.prevent="submit" class="space-y-6">
                                 <!-- Datos de la cuenta -->

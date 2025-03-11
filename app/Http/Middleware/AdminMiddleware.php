@@ -21,14 +21,8 @@ class AdminMiddleware
                 return response()->json(['error' => 'Unauthorized.'], 403);
             }
             
-            // Solo mostrar mensaje de error si el usuario es un aspirante
-            // intentando acceder a rutas administrativas, pero no cuando recién se registra
-            if (Auth::guard('web')->check() && !session()->has('_previous.url')) {
-                return redirect()->route('welcome')->with('error', 'No tienes acceso a esta página.');
-            }
-            
-            // Si no hay ningún usuario autenticado, redirigir a la página principal
-            return redirect()->route('admin.login');
+            // Redirigir SIEMPRE a welcome con un mensaje de error, independientemente del estado de autenticación
+            return redirect()->route('welcome')->with('error', 'No tienes acceso a esta página.');
         }
 
         return $next($request);

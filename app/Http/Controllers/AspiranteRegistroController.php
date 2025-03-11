@@ -165,7 +165,7 @@ class AspiranteRegistroController extends Controller
             Auth::login($user);
             
             // Redireccionar al usuario a la página de bienvenida con mensaje de éxito
-            return redirect()->route('welcome')->with('success', 'Registro completado exitosamente');
+            return redirect()->route('welcome')->with('success', 'Registro completado exitosamente')->with('scroll_top', true);
             
         } catch (\Exception $e) {
             // Revertir transacción en caso de error
