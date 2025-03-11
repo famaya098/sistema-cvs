@@ -79,7 +79,6 @@ onMounted(() => {
                     </div>
                     
                     <!-- Botones de login/register en la esquina superior derecha -->
-                    <!-- Botones de login/register en la esquina superior derecha -->
                     <nav v-if="canLogin" class="flex gap-3 absolute top-0 right-0 md:right-4">
                         <template v-if="$page.props.auth.user">
                             <!-- Usuario autenticado (aspirante) -->

@@ -543,12 +543,21 @@ watch(() => infoForm.id_nivel_academico, (newValue) => {
                                             Subido el {{ new Date(curriculumActual.created_at).toLocaleDateString() }}
                                         </p>
                                     </div>
-                                    <button 
+                                    <!-- <button 
                                         @click="downloadCurrentCV"
-                                        class="btn btn-sm btn-primary"
+                                        class="btn btn-info"
                                     >
                                         Descargar
+                                    </button> -->
+
+                                    <button @click="downloadCurrentCV" class="btn flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-[1.2em]">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A1.125 1.125 0 0 0 4.125 20.25h15.75A1.125 1.125 0 0 0 21 18.75V16.5M7.5 12 12 16.5m0 0 4.5-4.5M12 16.5V3"/>
+                                        </svg>
+                                        Descargar
                                     </button>
+
+                                    
                                 </div>
                             </div>
 

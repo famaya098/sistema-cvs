@@ -506,6 +506,38 @@ const submit = () => {
                                 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
                                     <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Curriculum Vitae</h3>
                                     
+                                    <div class="space-y-1">
+                                        <label for="cv" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Suba su CV en formato PDF *
+                                        </label>
+                                        <div class="flex flex-col space-y-2">
+                                            <input 
+                                                type="file" 
+                                                id="cv" 
+                                                ref="fileInput"
+                                                class="file-input file-input-bordered w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                                accept=".pdf" 
+                                                @change="handleFileUpload"
+                                                required
+                                            />
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                Formato permitido: PDF. Tamaño máximo: 5MB.
+                                            </p>
+                                            <span v-if="previewCv" class="text-sm text-gray-600 dark:text-gray-400 truncate max-w-xs">
+                                                {{ previewCv }}
+                                            </span>
+                                            <span v-else class="text-sm text-gray-500 dark:text-gray-400">
+                                                Ningún archivo seleccionado
+                                            </span>
+                                        </div>
+                                        <InputError class="mt-1" :message="form.errors.cv" />
+                                    </div>
+                                </div>
+
+                                <!-- Curriculum Vitae
+                                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
+                                    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Curriculum Vitae</h3>
+                                    
                                     <div class="space-y-2">
                                         <label for="cv" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Suba su CV en formato PDF *
@@ -542,7 +574,7 @@ const submit = () => {
                                         </p>
                                         <InputError class="mt-1" :message="form.errors.cv" />
                                     </div>
-                                </div>
+                                </div>  -->
 
                                 <!-- Captcha -->
                                 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
