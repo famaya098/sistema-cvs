@@ -32,10 +32,10 @@ class AspiranteRegistroController extends Controller
         $estadosAcademicos = EstadoAcademico::where('estado', true)->get();
         $nivelesExperiencia = NivelExperiencia::where('estado', true)->get();
         
-        // Log para depuración
-        Log::info('Niveles académicos: ' . $nivelesAcademicos->count());
-        Log::info('Estados académicos: ' . $estadosAcademicos->count());
-        Log::info('Niveles experiencia: ' . $nivelesExperiencia->count());
+        // logs
+        // Log::info('Niveles académicos: ' . $nivelesAcademicos->count());
+        // Log::info('Estados académicos: ' . $estadosAcademicos->count());
+        // Log::info('Niveles experiencia: ' . $nivelesExperiencia->count());
         
         return Inertia::render('Auth/RegisterExtended', [
             'nivelesAcademicos' => $nivelesAcademicos,
@@ -85,7 +85,7 @@ class AspiranteRegistroController extends Controller
         ]);
         
         try {
-            // Iniciar transacción para asegurar que todos los datos se guarden o ninguno
+            // 
             DB::beginTransaction();
             
             // Crear el usuario

@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        // Si ya hay un aspirante autenticado, redirigir a la bienvenida
+        // si ya hay un aspirante autenticado, redirigir a la bienvenida
         if (Auth::guard('web')->check()) {
             return redirect()->route('welcome');
         }

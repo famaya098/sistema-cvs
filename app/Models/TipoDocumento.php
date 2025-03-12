@@ -19,6 +19,5 @@ class TipoDocumento extends Model
         'estado' => 'boolean',
     ];
     
-    // No timestamps
     public $timestamps = false;
 }

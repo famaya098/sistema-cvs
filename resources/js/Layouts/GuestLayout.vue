@@ -8,6 +8,7 @@ function toggleDarkMode() {
     isDark.value = !isDark.value;
     localStorage.setItem("darkMode", isDark.value);
 }
+
 </script>
 
 <template>

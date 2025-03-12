@@ -9,6 +9,15 @@ defineProps({
     },
 });
 
+const goBack = () => {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback a una ruta predeterminada si no hay historial
+        router.visit(route('welcome'));
+    }
+};
+
 const form = useForm({
     email: '',
 });
@@ -36,12 +45,13 @@ const submit = () => {
                 <div class="max-w-md mx-auto">
                     <div class="bg-white dark:bg-[#303844] rounded-xl shadow-xl overflow-hidden">
                         <div class="px-8 py-6">
+                            
 
                             
                             <div class="text-center space-y-2 mb-8">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Recuperar Contraseña</h2>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Ingrese su correo electrónico y le enviaremos un enlace para restablecer su contraseña
+                                    Ingresa tu correo electrónico y te enviaremos un enlace para restablecer la contraseña
                                 </p>
                             </div>
 

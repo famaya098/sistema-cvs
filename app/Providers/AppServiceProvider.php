@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Agregar validación de captcha
+        // validación de captcha
         Validator::extend('captcha', function ($attribute, $value, $parameters, $validator) {
             $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
                 'secret' => config('captcha.secret'),

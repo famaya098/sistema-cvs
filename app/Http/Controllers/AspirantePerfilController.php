@@ -33,7 +33,7 @@ class AspirantePerfilController extends Controller
             ->where('user_id', $user->id)
             ->first();
             
-        // Obtener el CV actual
+        //  CV actual
         $cv = null;
         if ($perfil) {
             $cv = UsuarioDocumento::with('documento')
@@ -92,10 +92,10 @@ class AspirantePerfilController extends Controller
             'id_experiencia' => 'required|exists:niveles_experiencia,id',
         ]);
         
-        // Actualizar perfil
+        // update perfil
         $perfil->update($validated);
         
-        // Actualizar el nombre del usuario también
+        // update el nombre del usuario también
         $user->name = $validated['nombre_completo'];
         $user->save();
         
@@ -146,14 +146,14 @@ class AspirantePerfilController extends Controller
             return redirect()->back()->with('error', 'No se encontró el CV para descargar');
         }
         
-        // Obtener ruta del archivo
+        // ruta del archivo
         $filePath = $cv->documento->ruta;
         
         try {
             // Crear un nombre para descargar
             $downloadName = 'CV_' . $user->name . '_' . date('YmdHis') . '.pdf';
             
-            // Descargar archivo desde S3
+            // descargar archivo desde S3
             return Storage::disk('s3')->download($filePath, $downloadName);
         } catch (\Exception $e) {
             Log::error('Error al descargar CV: ' . $e->getMessage());
@@ -178,7 +178,7 @@ class AspirantePerfilController extends Controller
         DB::beginTransaction();
         
         try {
-            // Obtener el CV actual
+            //  CV actual
             $currentCVDocument = UsuarioDocumento::with('documento')
                 ->where('id_aspirante', $perfil->id_aspirante)
                 ->whereHas('documento.tipoDocumento', function ($query) {

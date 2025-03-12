@@ -8,6 +8,8 @@ import { onMounted } from 'vue';
 
 import FlashMessages from '@/Components/FlashMessages.vue';
 
+const showUserMenu = ref(false);
+
 const props = defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
@@ -21,7 +23,7 @@ const filterForm = ref({
     search: props.filters?.search || '',
 });
 
-// Función para aplicar filtros
+// aplicar filtros
 const applyFilters = debounce(() => {
     router.get(
         route('welcome'),
@@ -31,14 +33,14 @@ const applyFilters = debounce(() => {
             preserveScroll: true,
             replace: true,
             onSuccess: () => {
-                // Asegurarnos que el input mantiene el foco
+
                 document.getElementById('search-input')?.focus();
             }
         }
     );
 }, 500);
 
-// Observar cambios en los filtros
+//  cambios en los filtros
 watch(() => filterForm.value.search, (newValue, oldValue) => {
     if (newValue !== oldValue) {
         applyFilters();
@@ -63,7 +65,7 @@ onMounted(() => {
     <Head title="Bienvenido" />
     <GuestLayout>
         <div class="bg-gradient-to-b from-[#363d4d] to-[#2c3340] min-h-screen" id="top">
-            <!-- Reemplazar los mensajes de alerta por el componente -->
+            <!-- mensajes de alerta  -->
             <FlashMessages />
             
             <!-- Header Section -->
@@ -77,67 +79,92 @@ onMounted(() => {
                             Banco Central de Reserva de El Salvador
                         </p>
                     </div>
-                    
-                    <!-- Botones de login/register en la esquina superior derecha -->
-                    <nav v-if="canLogin" class="flex gap-3 absolute top-0 right-0 md:right-4">
-                        <template v-if="$page.props.auth.user">
-                            <!-- Usuario autenticado (aspirante) -->
-                            <div class="flex items-center gap-2 px-4 py-2 text-white">
-                                <span class="text-sm">{{ $page.props.auth.user.name }}</span>
-                                <Link
-                                    :href="route('aspirante.perfil')"
-                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
-                                >
-                                    Mi Perfil
-                                </Link>
-                                <Link
-                                    :href="route('logout')"
-                                    method="post"
-                                    as="button"
-                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
-                                >
-                                    Cerrar Sesión
-                                </Link>
-                            </div>
-                        </template>
-                        <template v-else-if="$page.props.auth.admin">
-                            <!-- Administrador autenticado -->
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm text-white">Admin: {{ $page.props.auth.admin.name }}</span>
-                                <Link
-                                    :href="route('plazas.index')"
-                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
-                                >
-                                    Panel Admin
-                                </Link>
-                                <Link
-                                    :href="route('admin.logout')"
-                                    method="post"
-                                    as="button"
-                                    class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
-                                >
-                                    Cerrar Sesión
-                                </Link>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <!-- Usuario no autenticado -->
-                            <Link
-                                :href="route('login')"
-                                class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
-                            >
-                                Iniciar Sesión
-                            </Link>
 
-                            <Link
-                                v-if="canRegister"
-                                :href="route('registro.aspirante')"
-                                class="px-4 py-2 text-sm font-medium text-white border border-white rounded-lg hover:bg-white hover:text-[#363d4d] transition duration-200"
-                            >
-                                Registrarse
-                            </Link>
-                        </template>
-                    </nav>
+                        <nav v-if="canLogin" class="absolute top-0 right-0 md:right-4">
+                            <div class="relative">
+                                <!-- Botón de menú desplegable -->
+                                <button 
+                                    class="flex items-center gap-2 px-4 py-2 text-white border border-white/30 rounded-lg bg-[#30374a]/50 backdrop-blur-sm hover:bg-[#30374a] transition duration-200"
+                                    @click="showUserMenu = !showUserMenu"
+                                >
+                                    <template v-if="$page.props.auth.user">
+                                        <span class="text-sm hidden md:inline">{{ $page.props.auth.user.name }}</span>
+                                        <span class="text-sm md:hidden">Mi cuenta</span>
+                                    </template>
+                                    <template v-else-if="$page.props.auth.admin">
+                                        <span class="text-sm hidden md:inline">{{ $page.props.auth.admin.name }}</span>
+                                        <span class="text-sm md:hidden">Admin</span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="text-sm">Acceder</span>
+                                    </template>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+
+                                <!-- Menú desplegable -->
+                                <div v-show="showUserMenu" 
+                                    class="absolute right-0 mt-2 w-48 bg-white dark:bg-[#303844] rounded-lg shadow-xl z-50 overflow-hidden">
+                                    <!-- Usuario aspirante -->
+                                    <template v-if="$page.props.auth.user">
+                                        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white truncate">{{ $page.props.auth.user.name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $page.props.auth.user.email }}</p>
+                                        </div>
+                                        <Link :href="route('aspirante.perfil')" 
+                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            @click="showUserMenu = false">
+                                            Mi Perfil
+                                        </Link>
+                                        <Link :href="route('logout')" method="post" as="button"
+                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            @click="showUserMenu = false">
+                                            Cerrar Sesión
+                                        </Link>
+                                    </template>
+
+                                    <!-- Administrador -->
+                                    <template v-else-if="$page.props.auth.admin">
+                                        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white truncate">{{ $page.props.auth.admin.name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Administrador</p>
+                                        </div>
+                                        <Link :href="route('plazas.index')" 
+                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            @click="showUserMenu = false">
+                                            Panel Admin
+                                        </Link>
+                                        <Link :href="route('admin.logout')" method="post" as="button"
+                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            @click="showUserMenu = false">
+                                            Cerrar Sesión
+                                        </Link>
+                                    </template>
+
+                                    <!-- No autenticado -->
+                                    <template v-else>
+                                        <Link :href="route('login')" 
+                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            @click="showUserMenu = false">
+                                            Iniciar Sesión
+                                        </Link>
+                                        <Link v-if="canRegister" :href="route('registro.aspirante')"
+                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            @click="showUserMenu = false">
+                                            Registrarse
+                                        </Link>
+                                    </template>
+                                </div>
+
+                                <!-- Overlay para cerrar menú al hacer clic fuera -->
+                                <div v-if="showUserMenu" 
+                                    class="fixed inset-0 z-40" 
+                                    @click="showUserMenu = false"></div>
+                            </div>
+                        </nav>
+                    
+                    
                 </div>
 
                 <!-- Barra de búsqueda -->
@@ -254,7 +281,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Estilo para las tarjetas en hover */
 .hover\:shadow-xl {
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }

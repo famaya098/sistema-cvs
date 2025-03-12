@@ -11,7 +11,6 @@ class NivelAcademico extends Model
     
     protected $fillable = ['nombre', 'estado', 'requiere_especialidad'];
     
-    // No timestamps
     public $timestamps = false;
     
     protected $casts = [

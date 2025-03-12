@@ -13,6 +13,15 @@ defineProps({
     },
 });
 
+const goBack = () => {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback a una ruta predeterminada si no hay historial
+        router.visit(route('welcome'));
+    }
+};
+
 const form = useForm({
     email: '',
     password: '',
@@ -50,22 +59,23 @@ const submit = () => {
                         <div class="px-8 py-6">
                             
                             <!-- Icono de retorno-->
-                            <Link 
-                                    :href="route('welcome')" 
-                                    class="flex items-center text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span></span>
-                                </Link>
+                            
+                            <button 
+                                @click="goBack"
+                                class="flex items-center text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                </svg>
+                                <span></span>
+                            </button>
 
                             <!-- -->
 
                             <div class="text-center space-y-2 mb-8">
                                 
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Iniciar Sesión</h2>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Ingrese sus credenciales para acceder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Ingresa tus credenciales para acceder</p>
                             </div>
 
                             <div v-if="status" class="mb-6 p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
@@ -99,7 +109,7 @@ const submit = () => {
                                             :href="route('password.request')"
                                             class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition"
                                         >
-                                            ¿Olvidó su contraseña?
+                                            ¿Olvidaste tu contraseña?
                                         </Link>
                                     </div>
                                     <input
@@ -131,12 +141,12 @@ const submit = () => {
 
                                 <div class="mt-4 text-center">
                                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        ¿No tiene una cuenta? 
+                                        ¿No tienes una cuenta? 
                                         <Link
                                             :href="route('registro.aspirante')"
                                             class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                                         >
-                                            Regístrese aquí
+                                            Regístrate aquí
                                         </Link>
                                     </p>
                                 </div>

@@ -10,7 +10,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 const showingNavigationDropdown = ref(false);
 const page = usePage();
 
-// Calcular qué tipo de usuario está autenticado
+// qué tipo de usuario está autenticado
 const isAdmin = computed(() => !!page.props.auth.admin);
 const currentUser = computed(() => isAdmin.value ? page.props.auth.admin : page.props.auth.user);
 const logoutRoute = computed(() => isAdmin.value ? 'admin.logout' : 'logout');

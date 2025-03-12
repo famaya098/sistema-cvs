@@ -11,7 +11,6 @@ class EstadoAcademico extends Model
     
     protected $fillable = ['nombre', 'estado'];
     
-    // No timestamps
     public $timestamps = false;
     
     protected $casts = [

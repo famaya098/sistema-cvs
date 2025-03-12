@@ -13,7 +13,16 @@ const props = defineProps({
     nivelesExperiencia: Array,
 });
 
-// Calcular si el nivel académico requiere especialidad
+const goBack = () => {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback a una ruta predeterminada si no hay historial
+        router.visit(route('welcome'));
+    }
+};
+
+// nivel académico requiere especialidad?
 const requiereEspecialidad = computed(() => {
     if (!infoForm.id_nivel_academico) return false;
     const nivelSeleccionado = props.nivelesAcademicos.find(nivel => nivel.id == infoForm.id_nivel_academico);
@@ -195,26 +204,29 @@ watch(() => infoForm.id_nivel_academico, (newValue) => {
                 <span>{{ $page.props.flash.success }}</span>
             </div>
 
-            <!-- Enlaces de navegación -->
-            <div class="container mx-auto px-4 mb-6">
-                <div class="flex justify-between items-center">
-                    <Link 
-                        :href="route('welcome')" 
-                        class="flex items-center text-white hover:text-gray-300 transition"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                        </svg>
-                        <span>Volver a Plazas</span>
-                    </Link>
-                </div>
-            </div>
+            
 
+            <!-- Register Card -->
             <div class="container mx-auto px-4 mb-8">
-                <div class="max-w-3xl mx-auto">
+                
+                <div class="max-w-4xl mx-auto">
                     <div class="bg-white dark:bg-[#303844] rounded-xl shadow-xl overflow-hidden">
                         <!-- Información Personal -->
-                        <div class="p-6">
+                        <div class="px-8 py-6">
+
+                            <!-- Icono de retorno-->
+                            
+                            <button 
+                                @click="goBack"
+                                class="flex items-center text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                </svg>
+                                <span></span>
+                            </button>
+
+                            <!-- -->
 
                             <div class="text-center space-y-2 mb-8">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Información Personal</h2>
