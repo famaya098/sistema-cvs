@@ -1,11 +1,15 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';  
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { ref, onMounted } from 'vue';
+import FlashMessages from '@/Components/FlashMessages.vue';
+import axios from 'axios';
 
 const props = defineProps({
     plaza: Object,
 });
+
+const page = usePage();
 
 // Estado para la aplicación
 const aplicado = ref(false);
@@ -17,12 +21,13 @@ const verificarAplicacion = async () => {
     if (!props.plaza || !props.plaza.id_plaza) return;
     
     // Solo verificar si el usuario está autenticado
-    if (!$page.props.auth.user) return;
+    if (!page.props.auth.user) return;
     
     aplicacionCargando.value = true;
     
     try {
         const response = await axios.get(route('aplicaciones.verificar', props.plaza.id_plaza));
+        console.log("Respuesta verificación:", response.data);
         aplicado.value = response.data.aplicado;
         aplicacionInfo.value = response.data.aplicacion;
     } catch (error) {
@@ -87,6 +92,7 @@ const shareOnSocial = (platform) => {
 <template>
     <GuestLayout>
         <Head :title="plaza.titulo" />
+        <FlashMessages />
 
         <div class="bg-gradient-to-b from-[#363d4d] to-[#2c3340] py-8">
             <!-- Header Section -->
@@ -158,33 +164,6 @@ const shareOnSocial = (platform) => {
                                             {{ copied ? 'Copiado!' : 'Copiar enlace' }}
                                         </button>
                                         <button 
-                                            @click="shareOnSocial('facebook')" 
-                                            class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center"
-                                        >
-                                            <svg class="h-4 w-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
-                                            </svg>
-                                            Facebook
-                                        </button>
-                                        <button 
-                                            @click="shareOnSocial('twitter')" 
-                                            class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center"
-                                        >
-                                            <svg class="h-4 w-4 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z" />
-                                            </svg>
-                                            Twitter
-                                        </button>
-                                        <button 
-                                            @click="shareOnSocial('linkedin')" 
-                                            class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center"
-                                        >
-                                            <svg class="h-4 w-4 mr-2 text-blue-700" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M19.7 3H4.3A1.3 1.3 0 003 4.3v15.4A1.3 1.3 0 004.3 21h15.4a1.3 1.3 0 001.3-1.3V4.3A1.3 1.3 0 0019.7 3zM8.339 18.338H5.667v-8.59h2.672v8.59zM7.003 8.574a1.548 1.548 0 11-.002-3.096 1.548 1.548 0 01.002 3.096zm11.335 9.764h-2.669V14.16c0-.996-.018-2.277-1.388-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248h-2.667v-8.59h2.56v1.174h.037c.355-.675 1.227-1.387 2.524-1.387 2.704 0 3.203 1.778 3.203 4.092v4.71z" />
-                                            </svg>
-                                            LinkedIn
-                                        </button>
-                                        <button 
                                             @click="shareOnSocial('whatsapp')" 
                                             class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center"
                                         >
@@ -193,6 +172,31 @@ const shareOnSocial = (platform) => {
                                             </svg>
                                             WhatsApp
                                         </button>
+                                        <button 
+                                            @click="shareOnSocial('facebook')" 
+                                            class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center"
+                                        >
+                                            <svg class="h-4 w-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
+                                            </svg>
+                                            Facebook
+                                        </button>
+                                        <button @click="shareOnSocial('twitter')" class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center">
+                                        <svg class="h-4 w-4 mr-2 text-black dark:text-white" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                        </svg>
+                                        X
+                                        </button>
+                                        <!-- <button 
+                                            @click="shareOnSocial('linkedin')" 
+                                            class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center"
+                                        >
+                                            <svg class="h-4 w-4 mr-2 text-blue-700" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M19.7 3H4.3A1.3 1.3 0 003 4.3v15.4A1.3 1.3 0 004.3 21h15.4a1.3 1.3 0 001.3-1.3V4.3A1.3 1.3 0 0019.7 3zM8.339 18.338H5.667v-8.59h2.672v8.59zM7.003 8.574a1.548 1.548 0 11-.002-3.096 1.548 1.548 0 01.002 3.096zm11.335 9.764h-2.669V14.16c0-.996-.018-2.277-1.388-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248h-2.667v-8.59h2.56v1.174h.037c.355-.675 1.227-1.387 2.524-1.387 2.704 0 3.203 1.778 3.203 4.092v4.71z" />
+                                            </svg>
+                                            LinkedIn
+                                        </button> -->
+                                        
                                     </div>
                                 </div>
                                 
@@ -208,7 +212,7 @@ const shareOnSocial = (platform) => {
                             ></div>
 
                             <!-- Botón de aplicar (solo visible para usuarios autenticados) -->
-                            <div v-if="$page.props.auth.user" class="mt-10">
+                            <div v-if="page.props.auth.user" class="mt-10">
                                 <div class="bg-gray-50 dark:bg-[#2c3340]/50 p-6 rounded-lg border border-gray-200 dark:border-gray-700 text-center">
                                     <div v-if="aplicacionCargando" class="flex justify-center">
                                         <svg class="animate-spin h-8 w-8 text-[#363d4d]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -217,7 +221,7 @@ const shareOnSocial = (platform) => {
                                         </svg>
                                     </div>
                                     <div v-else-if="aplicado">
-                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">¡Ya ha aplicado a esta plaza!</h3>
+                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">¡Ya haz aplicado a esta plaza!</h3>
                                         <p class="text-gray-600 dark:text-gray-300 mb-4">Su aplicación ha sido registrada correctamente.</p>
                                         <div class="inline-flex items-center justify-center px-4 py-2 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 rounded-lg">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

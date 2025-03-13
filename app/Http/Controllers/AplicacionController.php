@@ -43,7 +43,7 @@ class AplicacionController extends Controller
             ->first();
             
         if ($aplicacionExistente) {
-            return redirect()->back()->with('info', 'Ya ha aplicado a esta plaza anteriormente');
+            return redirect()->back()->with('info', 'Ya haz aplicado a esta plaza anteriormente');
         }
         
         // Verificar si la plaza existe y está vigente
@@ -72,8 +72,10 @@ class AplicacionController extends Controller
             $aplicacion->save();
             
             DB::commit();
+
+            // Redirigir con mensaje de éxito
+            return redirect()->back()->with('success', '¡Haz aplicado exitosamente a esta plaza!');
             
-            return redirect()->back()->with('success', 'Ha aplicado exitosamente a esta plaza');
             
         } catch (\Exception $e) {
             DB::rollBack();
