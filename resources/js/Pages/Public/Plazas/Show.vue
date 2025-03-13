@@ -7,6 +7,45 @@ const props = defineProps({
     plaza: Object,
 });
 
+// Estado para la aplicación
+const aplicado = ref(false);
+const aplicacionInfo = ref(null);
+const aplicacionCargando = ref(false);
+
+// Verificar si el usuario ya aplicó a esta plaza
+const verificarAplicacion = async () => {
+    if (!props.plaza || !props.plaza.id_plaza) return;
+    
+    // Solo verificar si el usuario está autenticado
+    if (!$page.props.auth.user) return;
+    
+    aplicacionCargando.value = true;
+    
+    try {
+        const response = await axios.get(route('aplicaciones.verificar', props.plaza.id_plaza));
+        aplicado.value = response.data.aplicado;
+        aplicacionInfo.value = response.data.aplicacion;
+    } catch (error) {
+        console.error("Error al verificar aplicación:", error);
+    } finally {
+        aplicacionCargando.value = false;
+    }
+};
+
+// Aplicar a la plaza
+const aplicarAPlaza = () => {
+    if (aplicacionCargando.value) return;
+    
+    window.location.href = route('aplicaciones.aplicar', props.plaza.id_plaza);
+};
+
+onMounted(() => {
+    // Verificar aplicación cuando se carga el componente
+    verificarAplicacion();
+});
+
+
+
 // Estado para el botón de compartir
 const shareOptionsVisible = ref(false);
 const copied = ref(false);
@@ -171,17 +210,37 @@ const shareOnSocial = (platform) => {
                             <!-- Botón de aplicar (solo visible para usuarios autenticados) -->
                             <div v-if="$page.props.auth.user" class="mt-10">
                                 <div class="bg-gray-50 dark:bg-[#2c3340]/50 p-6 rounded-lg border border-gray-200 dark:border-gray-700 text-center">
-                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">¿Te interesa esta oportunidad de empleo?</h3>
-                                    <p class="text-gray-600 dark:text-gray-300 mb-4">Completa tu aplicación ahora</p>
-                                    <button
-                                        @click="alert('Funcionalidad en desarrollo')"
-                                        class="px-6 py-3 text-sm font-medium text-white bg-[#363d4d] hover:bg-[#0b1535] dark:bg-[#363d4d] dark:hover:bg-[#2c3340] rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#363d4d] inline-flex items-center"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <div v-if="aplicacionCargando" class="flex justify-center">
+                                        <svg class="animate-spin h-8 w-8 text-[#363d4d]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Aplicar a esta plaza
-                                    </button>
+                                    </div>
+                                    <div v-else-if="aplicado">
+                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">¡Ya ha aplicado a esta plaza!</h3>
+                                        <p class="text-gray-600 dark:text-gray-300 mb-4">Su aplicación ha sido registrada correctamente.</p>
+                                        <div class="inline-flex items-center justify-center px-4 py-2 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 rounded-lg">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Aplicación enviada
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">¿Te interesa esta oportunidad de empleo?</h3>
+                                        <p class="text-gray-600 dark:text-gray-300 mb-4">Completa tu aplicación ahora</p>
+                                        <Link
+                                            :href="route('aplicaciones.aplicar', plaza.id_plaza)"
+                                            method="post"
+                                            as="button"
+                                            class="px-6 py-3 text-sm font-medium text-white bg-[#363d4d] hover:bg-[#0b1535] dark:bg-[#363d4d] dark:hover:bg-[#2c3340] rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#363d4d] inline-flex items-center"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Aplicar a esta plaza
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                             

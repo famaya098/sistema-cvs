@@ -65,6 +65,12 @@ Route::middleware(['auth:web'])->group(function () {
         ->name('aspirante.perfil.cv.download');
     Route::post('/aspirante/perfil/cv/update', [App\Http\Controllers\AspirantePerfilController::class, 'updateCV'])
         ->name('aspirante.perfil.cv.update');
+    
+    // Rutas para aplicaciones
+    Route::post('/plazas/{plaza}/aplicar', [App\Http\Controllers\AplicacionController::class, 'aplicar'])
+        ->name('aplicaciones.aplicar');
+    Route::get('/plazas/{plaza}/verificar-aplicacion', [App\Http\Controllers\AplicacionController::class, 'verificarAplicacion'])
+        ->name('aplicaciones.verificar');
 });
 
 // Rutas para el registro extendido de aspirantes
