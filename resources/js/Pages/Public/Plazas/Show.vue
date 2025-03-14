@@ -208,7 +208,7 @@ const shareOnSocial = (platform) => {
                             <!-- Contenido HTML de la plaza con estilos mejorados -->
                             <div 
                                 v-html="plaza.contenido_html" 
-                                class="content-html prose max-w-none dark:prose-invert prose-headings:text-[#111e60] dark:prose-headings:text-gray-200 prose-img:inline-block prose-img:align-middle"
+                                class="content-html prose max-w-none light-theme prose-headings:text-[#111e60] prose-img:inline-block prose-img:align-middle"
                             ></div>
 
                             <!-- Botón de aplicar (solo visible para usuarios autenticados) -->
@@ -331,6 +331,7 @@ const shareOnSocial = (platform) => {
                                     </div>
                                 </div>
                             </div> -->
+                        
                         </div>
                     </div>
                 </div>
@@ -340,6 +341,50 @@ const shareOnSocial = (platform) => {
 </template>
 
 <style>
+
+/* Nuevo contenedor con tema claro forzado */
+.light-theme {
+    /* Fondo blanco con borde sutil */
+    background-color: white !important;
+    color: #374151 !important;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Asegurar que todos los elementos dentro usen colores del tema claro */
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme h4,
+.light-theme h5,
+.light-theme h6 {
+    color: #111e60 !important;
+}
+
+.light-theme p,
+.light-theme li,
+.light-theme strong {
+    color: #374151 !important;
+}
+
+.light-theme a {
+    color: #2563eb !important;
+}
+
+.light-theme a:hover {
+    color: #1d4ed8 !important;
+}
+
+.light-theme strong[style*="color: rgb(0, 0, 128)"] {
+    color: #111e60 !important;
+}
+
+.light-theme ul li::marker {
+    color: #111e60 !important;
+}
+
 /* Estilos para el contenido del editor Quill */
 .content-html {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -368,6 +413,19 @@ const shareOnSocial = (platform) => {
 /* Estilos de encabezados */
 .content-html h1 {
     font-size: 2em;
+    font-weight: bold;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    color: #111e60;
+    line-height: 1.2;
+}
+
+.dark .content-html h1 {
+    color: #f3f4f6;
+}
+
+.content-html h2 {
+    font-size: 1.8em;
     font-weight: bold;
     margin-top: 1.5em;
     margin-bottom: 0.8em;
@@ -412,6 +470,10 @@ const shareOnSocial = (platform) => {
 /* Espaciado y párrafos */
 .content-html p {
     margin: 1em 0;
+}
+
+.dark .content-html p {
+    color: #e5e7eb;
 }
 
 /* Imágenes */
@@ -463,6 +525,11 @@ const shareOnSocial = (platform) => {
     color: #93c5fd !important;
 }
 
+/* Mejora para textos específicos con otros colores */
+.dark .content-html [style*="color"] {
+    filter: brightness(1.5);
+}
+
 /* Estilos para bloques de contenido */
 .content-html blockquote {
     border-left: 4px solid #e5e7eb;
@@ -475,6 +542,30 @@ const shareOnSocial = (platform) => {
 .dark .content-html blockquote {
     border-left-color: #4b5563;
     color: #9ca3af;
+}
+
+/* Mejoras para otros elementos en modo oscuro */
+.dark .content-html table {
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+.dark .content-html th {
+    background-color: #374151;
+    color: #f9fafb;
+}
+
+.dark .content-html td {
+    border-color: #4b5563;
+}
+
+/* Adaptación de elementos específicos de BCR */
+.dark .content-html strong[style*="color: rgb"] {
+    color: #93c5fd !important;
+}
+
+.dark .content-html img[src*="iconosweb"] {
+    filter: brightness(1.5) contrast(1.2);
 }
 
 /* Estilos responsivos para dispositivos móviles */
@@ -514,16 +605,3 @@ const shareOnSocial = (platform) => {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 </style>
-    line-height: 1.2;
-}
-
-.dark .content-html h1 {
-    color: #f3f4f6;
-}
-
-.content-html h2 {
-    font-size: 1.8em;
-    font-weight: bold;
-    margin-top: 1.5em;
-    margin-bottom: 0.8em;
-    color: #111e60;

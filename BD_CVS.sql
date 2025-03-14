@@ -51,10 +51,11 @@ create table estados_academicos
 
 create table estados_aplicacion
 (
-    id     bigint auto_increment
+    id          bigint auto_increment
         primary key,
-    nombre varchar(50)          not null,
-    estado tinyint(1) default 1 null
+    nombre      varchar(50)          not null,
+    estado      tinyint(1) default 1 null,
+    Descripcion varchar(255)         null
 );
 
 create table failed_jobs
@@ -149,26 +150,38 @@ create table secciones
 
 create table plazas
 (
-    id_plaza                 bigint auto_increment
+    id_plaza                      bigint auto_increment
         primary key,
-    titulo                   varchar(200)                         not null,
-    alias_plaza              varchar(200)                         null,
-    id_seccion               bigint                               null,
-    id_categoria             bigint                               null,
-    publicado                tinyint(1) default 0                 null,
-    estado                   tinyint                              not null,
-    pagina_principal         tinyint(1) default 0                 null,
-    id_autor                 bigint                               null,
-    user_id                  bigint unsigned                      null,
-    alias_autor              varchar(50)                          null,
-    id_nivel_acceso          bigint                               null,
-    created_at               datetime   default CURRENT_TIMESTAMP null,
-    updated_at               datetime                             null on update CURRENT_TIMESTAMP,
-    fecha_inicio_publicacion date                                 null,
-    fecha_fin_publicacion    date                                 null,
-    contenido_html           longtext                             null,
-    accesos                  int        default 0                 null,
-    deleted_at               datetime                             null,
+    titulo                        varchar(200)                         not null,
+    alias_plaza                   varchar(200)                         null,
+    id_seccion                    bigint                               null,
+    id_categoria                  bigint                               null,
+    publicado                     tinyint(1) default 0                 null,
+    estado                        tinyint                              not null,
+    pagina_principal              tinyint(1) default 0                 null,
+    id_autor                      bigint                               null,
+    user_id                       bigint unsigned                      null,
+    alias_autor                   varchar(50)                          null,
+    id_nivel_acceso               bigint                               null,
+    created_at                    datetime   default CURRENT_TIMESTAMP null,
+    updated_at                    datetime                             null on update CURRENT_TIMESTAMP,
+    id_nivel_academico_requerido  bigint                               null,
+    id_estado_academico_requerido bigint                               null,
+    id_experiencia_requerido      bigint                               null,
+    fecha_inicio_publicacion      date                                 null,
+    fecha_fin_publicacion         date                                 null,
+    contenido_html                longtext                             null,
+    accesos                       int        default 0                 null,
+    deleted_at                    datetime                             null,
+    constraint fk_plazas_estado_academico
+        foreign key (id_estado_academico_requerido) references estados_academicos (id)
+            on update cascade on delete set null,
+    constraint fk_plazas_experiencia
+        foreign key (id_experiencia_requerido) references niveles_experiencia (id)
+            on update cascade on delete set null,
+    constraint fk_plazas_nivel_academico
+        foreign key (id_nivel_academico_requerido) references niveles_academicos (id)
+            on update cascade on delete set null,
     constraint fk_plazas_users
         foreign key (user_id) references admin_users (id),
     constraint plazas_ibfk_1
@@ -188,6 +201,15 @@ create index id_nivel_acceso
 
 create index id_seccion
     on plazas (id_seccion);
+
+create index idx_estado_academico_req
+    on plazas (id_estado_academico_requerido);
+
+create index idx_experiencia_req
+    on plazas (id_experiencia_requerido);
+
+create index idx_nivel_academico_req
+    on plazas (id_nivel_academico_requerido);
 
 create index idx_plazas_busqueda
     on plazas (titulo, alias_plaza);

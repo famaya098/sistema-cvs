@@ -11,6 +11,9 @@ const props = defineProps({
     categorias: Array,
     plaza: Object,
     isEditMode: { type: Boolean, default: false },
+    nivelesAcademicos: Array,
+    estadosAcademicos: Array,
+    nivelesExperiencia: Array,
 });
 
 const quillOptions = {
@@ -42,7 +45,10 @@ const form = useForm({
     pagina_principal: false,
     fecha_inicio_publicacion: '',
     fecha_fin_publicacion: '',
-    contenido_html: ''
+    contenido_html: '',
+    id_nivel_academico_requerido: '',  
+    id_estado_academico_requerido: '', 
+    id_experiencia_requerido: ''       
 });
 
 const loadPlaza = () => {
@@ -57,6 +63,11 @@ const loadPlaza = () => {
         form.fecha_inicio_publicacion = props.plaza.fecha_inicio_publicacion;
         form.fecha_fin_publicacion = props.plaza.fecha_fin_publicacion;
         form.contenido_html = props.plaza.contenido_html || '';
+        
+        // nuevos campos
+        form.id_nivel_academico_requerido = props.plaza.id_nivel_academico_requerido || '';
+        form.id_estado_academico_requerido = props.plaza.id_estado_academico_requerido || '';
+        form.id_experiencia_requerido = props.plaza.id_experiencia_requerido || '';
     }
 };
 
@@ -273,6 +284,98 @@ const submitForm = () => {
                                     <span class="text-xs text-gray-500 dark:text-gray-400">Visible para usuarios</span>
                                 </div>
                             </label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Sección de  Requisitos de la plaza -->
+                <div class="bg-gray-50 dark:bg-[#2c3340]/60 rounded-xl p-5 mb-6">
+                    <h4 class="text-sm font-semibold uppercase text-gray-500 dark:text-gray-300 mb-4">Requisitos de la Plaza</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Nivel Académico Requerido -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-medium text-[#111e60] dark:text-gray-300">Nivel académico requerido</span>
+                            </label>
+                            <div class="relative">
+                                <select 
+                                    v-model="form.id_nivel_academico_requerido"
+                                    class="select select-bordered w-full text-[#111e60] dark:text-white bg-white dark:bg-gray-700 focus:ring-2 focus:ring-[#111e60]/20 focus:border-[#111e60] pr-10 transition duration-200"
+                                >
+                                    <option value="">Seleccione un nivel académico</option>
+                                    <option 
+                                        v-for="nivel in nivelesAcademicos" 
+                                        :key="nivel.id" 
+                                        :value="nivel.id"
+                                    >
+                                        {{ nivel.nombre }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div v-if="form.errors.id_nivel_academico_requerido" class="text-red-500 text-sm mt-1 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                {{ form.errors.id_nivel_academico_requerido }}
+                            </div>
+                        </div>
+
+                        <!-- Estado Académico Requerido -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-medium text-[#111e60] dark:text-gray-300">Estado académico requerido</span>
+                            </label>
+                            <div class="relative">
+                                <select 
+                                    v-model="form.id_estado_academico_requerido"
+                                    class="select select-bordered w-full text-[#111e60] dark:text-white bg-white dark:bg-gray-700 focus:ring-2 focus:ring-[#111e60]/20 focus:border-[#111e60] pr-10 transition duration-200"
+                                >
+                                    <option value="">Seleccione un estado académico</option>
+                                    <option 
+                                        v-for="estado in estadosAcademicos" 
+                                        :key="estado.id" 
+                                        :value="estado.id"
+                                    >
+                                        {{ estado.nombre }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div v-if="form.errors.id_estado_academico_requerido" class="text-red-500 text-sm mt-1 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                {{ form.errors.id_estado_academico_requerido }}
+                            </div>
+                        </div>
+
+                        <!-- Nivel de Experiencia Requerido -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-medium text-[#111e60] dark:text-gray-300">Experiencia requerida</span>
+                            </label>
+                            <div class="relative">
+                                <select 
+                                    v-model="form.id_experiencia_requerido"
+                                    class="select select-bordered w-full text-[#111e60] dark:text-white bg-white dark:bg-gray-700 focus:ring-2 focus:ring-[#111e60]/20 focus:border-[#111e60] pr-10 transition duration-200"
+                                >
+                                    <option value="">Seleccione un nivel de experiencia</option>
+                                    <option 
+                                        v-for="experiencia in nivelesExperiencia" 
+                                        :key="experiencia.id" 
+                                        :value="experiencia.id"
+                                    >
+                                        {{ experiencia.nombre }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div v-if="form.errors.id_experiencia_requerido" class="text-red-500 text-sm mt-1 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                {{ form.errors.id_experiencia_requerido }}
+                            </div>
                         </div>
                     </div>
                 </div>

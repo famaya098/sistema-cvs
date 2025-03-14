@@ -8,6 +8,10 @@ use App\Models\Categoria;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use App\Models\NivelAcademico;
+use App\Models\EstadoAcademico;
+use App\Models\NivelExperiencia;
+
 class PlazaController extends Controller
 {
     /**
@@ -24,7 +28,10 @@ class PlazaController extends Controller
             'fecha_fin_publicacion' => 'required|date|after:fecha_inicio_publicacion',
             'publicado' => 'boolean',
             'pagina_principal' => 'boolean',
-            'estado' => 'required|boolean'
+            'estado' => 'required|boolean',
+            'id_nivel_academico_requerido' => 'nullable|exists:niveles_academicos,id',
+            'id_estado_academico_requerido' => 'nullable|exists:estados_academicos,id',
+            'id_experiencia_requerido' => 'nullable|exists:niveles_experiencia,id'
         ];
     }
 
@@ -44,6 +51,9 @@ class PlazaController extends Controller
             'fecha_inicio_publicacion' => $validatedData['fecha_inicio_publicacion'],
             'fecha_fin_publicacion' => $validatedData['fecha_fin_publicacion'],
             'contenido_html' => $validatedData['contenido_html'],
+            'id_nivel_academico_requerido' => $validatedData['id_nivel_academico_requerido'] ?? null,
+            'id_estado_academico_requerido' => $validatedData['id_estado_academico_requerido'] ?? null,
+            'id_experiencia_requerido' => $validatedData['id_experiencia_requerido'] ?? null,
         ];
     }
 
@@ -80,13 +90,25 @@ class PlazaController extends Controller
         $plazas = $query->paginate(10);
         $secciones = Seccion::where('estado', true)->get();
         $categorias = Categoria::where('estado', true)->get();
+        $nivelesAcademicos = \App\Models\NivelAcademico::where('estado', true)->get();
+        $estadosAcademicos = \App\Models\EstadoAcademico::where('estado', true)->get();
+        $nivelesExperiencia = \App\Models\NivelExperiencia::where('estado', true)->get();
+
+        \Log::info('Niveles académicos: ' . $nivelesAcademicos->count());
+        \Log::info('Estados académicos: ' . $estadosAcademicos->count());
+        \Log::info('Niveles experiencia: ' . $nivelesExperiencia->count());
 
         return Inertia::render('Plazas/Index', [
             'plazas' => $plazas,
             'secciones' => $secciones,
             'categorias' => $categorias,
+            'nivelesAcademicos' => $nivelesAcademicos,
+            'estadosAcademicos' => $estadosAcademicos,
+            'nivelesExperiencia' => $nivelesExperiencia,
             'filters' => $request->all(['search', 'categoria', 'seccion', 'fecha_desde', 'fecha_hasta', 'estado']),
         ]);
+
+
     }
 
     public function store(Request $request)

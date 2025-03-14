@@ -15,6 +15,9 @@ const props = defineProps({
     secciones: Array,
     categorias: Array,
     filters: Object,
+    nivelesAcademicos: Array,  
+    estadosAcademicos: Array,
+    nivelesExperiencia: Array
 });
 
 // Filtros
@@ -412,15 +415,18 @@ const toggleFilters = () => {
         </div>
 
         <!-- Modal de Crear/Editar -->
-        <CreateEdit 
-            v-if="showModal"
-            :secciones="secciones" 
-            :categorias="categorias"
-            :plaza="selectedPlaza"
-            :isEditMode="isEditMode"
-            @close="closeModal"
-            @saved="closeModal"
-        />
+            <CreateEdit 
+        v-if="showModal"
+        :secciones="secciones" 
+        :categorias="categorias"
+        :niveles-academicos="nivelesAcademicos"
+        :estados-academicos="estadosAcademicos"
+        :niveles-experiencia="nivelesExperiencia"
+        :plaza="selectedPlaza"
+        :isEditMode="isEditMode"
+        @close="closeModal"
+        @saved="closeModal"
+    />
     </AuthenticatedLayout>
 </template>
 

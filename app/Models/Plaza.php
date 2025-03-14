@@ -26,7 +26,10 @@ class Plaza extends Model
         'fecha_inicio_publicacion',
         'fecha_fin_publicacion',
         'contenido_html',
-        'accesos'
+        'accesos',
+        'id_nivel_academico_requerido', 
+        'id_estado_academico_requerido',
+        'id_experiencia_requerido'    
     ];
 
     protected $casts = [
@@ -57,5 +60,20 @@ class Plaza extends Model
     public function aplicaciones()
     {
         return $this->hasMany(Aplicacion::class, 'id_plaza');
+    }
+
+    public function nivelAcademicoRequerido()
+    {
+        return $this->belongsTo(NivelAcademico::class, 'id_nivel_academico_requerido');
+    }
+
+    public function estadoAcademicoRequerido()
+    {
+        return $this->belongsTo(EstadoAcademico::class, 'id_estado_academico_requerido');
+    }
+
+    public function experienciaRequerida()
+    {
+        return $this->belongsTo(NivelExperiencia::class, 'id_experiencia_requerido');
     }
 }

@@ -43,7 +43,7 @@ class AplicacionController extends Controller
             ->first();
             
         if ($aplicacionExistente) {
-            return redirect()->back()->with('info', 'Ya haz aplicado a esta plaza anteriormente');
+            return redirect()->back()->with('info', 'Ya ha aplicado a esta plaza anteriormente');
         }
         
         // Verificar si la plaza existe y está vigente
@@ -58,6 +58,31 @@ class AplicacionController extends Controller
             return redirect()->back()->with('error', 'La plaza no está disponible');
         }
         
+        // NUEVO: Verificar si cumple con los requisitos
+        $cumpleRequisitos = true;
+        $razonesIncumplimiento = [];
+        
+        // Verificar nivel académico
+        if ($plaza->id_nivel_academico_requerido && $perfil->id_nivel_academico != $plaza->id_nivel_academico_requerido) {
+            $cumpleRequisitos = false;
+            $nivelRequerido = \App\Models\NivelAcademico::find($plaza->id_nivel_academico_requerido);
+            $razonesIncumplimiento[] = "Nivel académico requerido: " . ($nivelRequerido ? $nivelRequerido->nombre : 'No especificado');
+        }
+        
+        // Verificar estado académico
+        if ($plaza->id_estado_academico_requerido && $perfil->id_estado_academico != $plaza->id_estado_academico_requerido) {
+            $cumpleRequisitos = false;
+            $estadoRequerido = \App\Models\EstadoAcademico::find($plaza->id_estado_academico_requerido);
+            $razonesIncumplimiento[] = "Estado académico requerido: " . ($estadoRequerido ? $estadoRequerido->nombre : 'No especificado');
+        }
+        
+        // Verificar experiencia
+        if ($plaza->id_experiencia_requerido && $perfil->id_experiencia != $plaza->id_experiencia_requerido) {
+            $cumpleRequisitos = false;
+            $experienciaRequerida = \App\Models\NivelExperiencia::find($plaza->id_experiencia_requerido);
+            $razonesIncumplimiento[] = "Experiencia requerida: " . ($experienciaRequerida ? $experienciaRequerida->nombre : 'No especificada');
+        }
+        
         DB::beginTransaction();
         
         try {
@@ -67,19 +92,24 @@ class AplicacionController extends Controller
             $aplicacion->id_plaza = $idPlaza;
             $aplicacion->fecha_aplicacion = now();
             $aplicacion->id_documento = $cv->id_documento;
-            // Estado "Cumple Según Sistema"
-            $aplicacion->id_estado_aplicacion = 3;
+            
+            // Asignar estado según si cumple o no con los requisitos
+            $aplicacion->id_estado_aplicacion = $cumpleRequisitos ? 3 : 4; // 3: Cumple, 4: No Cumple
             $aplicacion->save();
             
             DB::commit();
-
-            // Redirigir con mensaje de éxito
-            return redirect()->back()->with('success', '¡Haz aplicado exitosamente a esta plaza!');
             
+            // Mensaje de éxito
+            if ($cumpleRequisitos) {
+                return redirect()->back()->with('success', '¡Has aplicado exitosamente a esta plaza!');
+            } else {
+                // Aún permitimos la aplicación pero notificamos que no cumple algunos requisitos
+                return redirect()->back()->with('success', 'Has aplicado a esta plaza, aunque no cumples con algunos requisitos: ' . implode(', ', $razonesIncumplimiento));
+            }
             
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Ocurrió un error al aplicar a esta plaza. Por favor, intente nuevamente.');
+            return redirect()->back()->with('error', 'Ocurrió un error al aplicar a esta plaza. Por favor, intente nuevamente: ' . $e->getMessage());
         }
     }
     
