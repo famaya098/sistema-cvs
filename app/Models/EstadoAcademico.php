@@ -9,7 +9,7 @@ class EstadoAcademico extends Model
     protected $table = 'estados_academicos';
     protected $primaryKey = 'id';
     
-    protected $fillable = ['nombre', 'estado'];
+    protected $fillable = ['nombre', 'orden', 'estado'];
     
     public $timestamps = false;
     

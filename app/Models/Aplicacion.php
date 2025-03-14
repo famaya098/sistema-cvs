@@ -18,6 +18,7 @@ class Aplicacion extends Model
         'id_cv',
         'id_documento',
         'id_estado_aplicacion',
+        'id_estado_admin_aplicacion',
     ];
     
     // Relaciones
@@ -39,5 +40,10 @@ class Aplicacion extends Model
     public function estado()
     {
         return $this->belongsTo(EstadoAplicacion::class, 'id_estado_aplicacion');
+    }
+    
+    public function estadoAdmin()
+    {
+        return $this->belongsTo(EstadoAplicacion::class, 'id_estado_admin_aplicacion');
     }
 }

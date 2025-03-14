@@ -9,7 +9,7 @@ class NivelExperiencia extends Model
     protected $table = 'niveles_experiencia';
     protected $primaryKey = 'id';
     
-    protected $fillable = ['nombre', 'estado'];
+    protected $fillable = ['nombre', 'orden', 'estado'];
     
     public $timestamps = false;
     

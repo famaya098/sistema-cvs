@@ -20,6 +20,7 @@ const props = defineProps({
     nivelesExperiencia: Array
 });
 
+
 // Filtros
 const filterForm = ref({
     search: props.filters?.search || '',

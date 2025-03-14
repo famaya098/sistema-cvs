@@ -44,6 +44,18 @@ Route::middleware('admin')->group(function () {
 
     // Ruta para la gestión de plazas
     Route::resource('plazas', PlazaController::class);
+
+    // Rutas para gestionar aplicaciones
+    Route::get('/admin/aplicaciones', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'index'])
+        ->name('admin.aplicaciones.index');
+    Route::patch('/admin/aplicaciones/{id}/estado', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'updateEstadoAdmin'])
+        ->name('admin.aplicaciones.updateEstado');
+
+    Route::get('/admin/aplicaciones/{id}', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'show'])
+        ->name('admin.aplicaciones.show');
+
+        Route::get('/admin/aplicaciones/{id}/cv', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'downloadCV'])
+        ->name('admin.aplicaciones.download.cv');
 });
 
 // Ruta pública para ver detalles de una plaza

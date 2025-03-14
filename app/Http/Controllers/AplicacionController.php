@@ -6,6 +6,9 @@ use App\Models\Aplicacion;
 use App\Models\Plaza;
 use App\Models\UsuarioPerfil;
 use App\Models\UsuarioDocumento;
+use App\Models\NivelAcademico;
+use App\Models\EstadoAcademico;
+use App\Models\NivelExperiencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,29 +61,41 @@ class AplicacionController extends Controller
             return redirect()->back()->with('error', 'La plaza no está disponible');
         }
         
-        // NUEVO: Verificar si cumple con los requisitos
+        // Verificar si cumple con los requisitos usando el campo "orden"
         $cumpleRequisitos = true;
         $razonesIncumplimiento = [];
         
-        // Verificar nivel académico
-        if ($plaza->id_nivel_academico_requerido && $perfil->id_nivel_academico != $plaza->id_nivel_academico_requerido) {
-            $cumpleRequisitos = false;
-            $nivelRequerido = \App\Models\NivelAcademico::find($plaza->id_nivel_academico_requerido);
-            $razonesIncumplimiento[] = "Nivel académico requerido: " . ($nivelRequerido ? $nivelRequerido->nombre : 'No especificado');
+        // Verificar nivel académico (orden jerárquico)
+        if ($plaza->id_nivel_academico_requerido) {
+            $nivelRequerido = NivelAcademico::find($plaza->id_nivel_academico_requerido);
+            $nivelAspiranteObj = NivelAcademico::find($perfil->id_nivel_academico);
+            
+            if (!$nivelAspiranteObj || $nivelAspiranteObj->orden < $nivelRequerido->orden) {
+                $cumpleRequisitos = false;
+                $razonesIncumplimiento[] = "Nivel académico requerido: " . ($nivelRequerido ? $nivelRequerido->nombre : 'No especificado');
+            }
         }
         
-        // Verificar estado académico
-        if ($plaza->id_estado_academico_requerido && $perfil->id_estado_academico != $plaza->id_estado_academico_requerido) {
-            $cumpleRequisitos = false;
-            $estadoRequerido = \App\Models\EstadoAcademico::find($plaza->id_estado_academico_requerido);
-            $razonesIncumplimiento[] = "Estado académico requerido: " . ($estadoRequerido ? $estadoRequerido->nombre : 'No especificado');
+        // Verificar estado académico (orden jerárquico)
+        if ($plaza->id_estado_academico_requerido) {
+            $estadoRequerido = EstadoAcademico::find($plaza->id_estado_academico_requerido);
+            $estadoAspiranteObj = EstadoAcademico::find($perfil->id_estado_academico);
+            
+            if (!$estadoAspiranteObj || $estadoAspiranteObj->orden < $estadoRequerido->orden) {
+                $cumpleRequisitos = false;
+                $razonesIncumplimiento[] = "Estado académico requerido: " . ($estadoRequerido ? $estadoRequerido->nombre : 'No especificado');
+            }
         }
         
-        // Verificar experiencia
-        if ($plaza->id_experiencia_requerido && $perfil->id_experiencia != $plaza->id_experiencia_requerido) {
-            $cumpleRequisitos = false;
-            $experienciaRequerida = \App\Models\NivelExperiencia::find($plaza->id_experiencia_requerido);
-            $razonesIncumplimiento[] = "Experiencia requerida: " . ($experienciaRequerida ? $experienciaRequerida->nombre : 'No especificada');
+        // Verificar experiencia (orden jerárquico)
+        if ($plaza->id_experiencia_requerido) {
+            $experienciaRequerida = NivelExperiencia::find($plaza->id_experiencia_requerido);
+            $experienciaAspiranteObj = NivelExperiencia::find($perfil->id_experiencia);
+            
+            if (!$experienciaAspiranteObj || $experienciaAspiranteObj->orden < $experienciaRequerida->orden) {
+                $cumpleRequisitos = false;
+                $razonesIncumplimiento[] = "Experiencia requerida: " . ($experienciaRequerida ? $experienciaRequerida->nombre : 'No especificada');
+            }
         }
         
         DB::beginTransaction();
@@ -94,7 +109,8 @@ class AplicacionController extends Controller
             $aplicacion->id_documento = $cv->id_documento;
             
             // Asignar estado según si cumple o no con los requisitos
-            $aplicacion->id_estado_aplicacion = $cumpleRequisitos ? 3 : 4; // 3: Cumple, 4: No Cumple
+            $aplicacion->id_estado_aplicacion = $cumpleRequisitos ? 3 : 4; // 3: Cumple, 4: No Cumple según sistema
+            // El estado según administrador quedará nulo hasta que un administrador lo revise
             $aplicacion->save();
             
             DB::commit();
@@ -125,7 +141,8 @@ class AplicacionController extends Controller
             return response()->json(['aplicado' => false]);
         }
         
-        $aplicacion = Aplicacion::where('id_aspirante', $perfil->id_aspirante)
+        $aplicacion = Aplicacion::with(['estado', 'estadoAdmin'])
+            ->where('id_aspirante', $perfil->id_aspirante)
             ->where('id_plaza', $idPlaza)
             ->first();
             

@@ -9,7 +9,7 @@ class NivelAcademico extends Model
     protected $table = 'niveles_academicos';
     protected $primaryKey = 'id';
     
-    protected $fillable = ['nombre', 'estado', 'requiere_especialidad'];
+    protected $fillable = ['nombre', 'orden', 'estado', 'requiere_especialidad'];
     
     public $timestamps = false;
     
