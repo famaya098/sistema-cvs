@@ -46,6 +46,7 @@ create table estados_academicos
     id     bigint auto_increment
         primary key,
     nombre varchar(50)          not null,
+    orden  int                  not null,
     estado tinyint(1) default 1 null
 );
 
@@ -119,6 +120,7 @@ create table niveles_academicos
     id                    bigint auto_increment
         primary key,
     nombre                varchar(50)          not null,
+    orden                 int                  not null,
     estado                tinyint(1) default 1 null,
     requiere_especialidad tinyint(1) default 0 null
 );
@@ -128,6 +130,7 @@ create table niveles_experiencia
     id     bigint auto_increment
         primary key,
     nombre varchar(50)          not null,
+    orden  int                  not null,
     estado tinyint(1) default 1 null
 );
 
@@ -307,14 +310,15 @@ create table usuario_perfil
 
 create table aplicaciones
 (
-    id_aplicacion        bigint auto_increment
+    id_aplicacion              bigint auto_increment
         primary key,
-    id_aspirante         bigint                             null,
-    id_plaza             bigint                             null,
-    fecha_aplicacion     datetime default CURRENT_TIMESTAMP null,
-    id_cv                bigint                             null,
-    id_documento         bigint                             null,
-    id_estado_aplicacion bigint                             null,
+    id_aspirante               bigint                             null,
+    id_plaza                   bigint                             null,
+    fecha_aplicacion           datetime default CURRENT_TIMESTAMP null,
+    id_cv                      bigint                             null,
+    id_documento               bigint                             null,
+    id_estado_aplicacion       bigint                             null,
+    id_estado_admin_aplicacion bigint                             null,
     constraint unique_aplicacion
         unique (id_aspirante, id_plaza),
     constraint aplicaciones_ibfk_1
@@ -365,3 +369,4 @@ create index id_nivel_academico
 
 create index idx_aspirantes_nombre
     on usuario_perfil (nombre_completo);
+
