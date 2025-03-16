@@ -92,13 +92,13 @@ const toggleFilters = () => {
                     Gestión de Plazas
                 </h2>
                 <button 
-                    class="btn bg-[#111e60] text-white hover:bg-[#0b1535] dark:bg-[#363d4d] dark:hover:bg-[#2c3340] flex items-center gap-2 px-4 transition duration-200" 
+                    class="btn flex items-center gap-2 bg-[#111e60] text-white hover:bg-[#1d2d86] focus:ring-4 focus:ring-[#111e60]/30 border-none shadow-md dark:bg-[#3b4671] dark:hover:bg-[#4a5590] dark:focus:ring-[#3b4671]/40 transition-all duration-200 rounded-md font-medium px-4 py-2"
                     @click="openCreateModal"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Nueva Plaza
+                    <span>Nueva Plaza</span>
                 </button>
             </div>
         </template>
@@ -479,5 +479,46 @@ tr:hover {
 
 .btn:active, a:active {
     transform: translateY(0);
+}
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: saturate(70%);
+}
+
+/* Personalización de foco */
+.btn:focus {
+  outline: none;
+}
+
+/* Transición suave para todos los botones */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de onda para botones primarios */
+.btn:not(:disabled)::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform .3s, opacity .5s;
+}
+
+.btn:not(:disabled):active::after {
+  transform: scale(0, 0);
+  opacity: .3;
+  transition: 0s;
 }
 </style>

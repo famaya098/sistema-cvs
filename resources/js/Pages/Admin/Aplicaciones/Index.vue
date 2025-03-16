@@ -3,6 +3,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, router, Link, usePage } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import debounce from 'lodash/debounce';
+import VerCVModal from './Modals/VerCVModal.vue';
+import PerfilAspiranteModal from './Modals/PerfilAspiranteModal.vue';
 
 const props = defineProps({
     aplicaciones: Object,
@@ -111,6 +113,21 @@ const openCVPreview = (aplicacion) => {
 const openProfileDetails = (aspirante) => {
     selectedAspirante.value = aspirante;
     showProfileModal.value = true;
+};
+
+// Cerrar modales
+const closeModals = () => {
+    showCVModal.value = false;
+    showProfileModal.value = false;
+};
+
+// Formateador para mostrar el estado de la aplicación de forma clara
+const getEstadoClass = (estadoId) => {
+    if (estadoId === 1) return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'; // Aprobado
+    if (estadoId === 2) return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400'; // Rechazado
+    if (estadoId === 3) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300'; // Cumple
+    if (estadoId === 4) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200'; // No cumple
+    return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'; // Por defecto
 };
 </script>
 
@@ -309,12 +326,12 @@ const openProfileDetails = (aspirante) => {
                                 <div class="flex justify-end">
                                     <button 
                                         @click="clearFilters"
-                                        class="btn btn-sm btn-outline text-[#111e60] hover:bg-[#111e60]/10 hover:border-[#111e60] dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-1 transition-all duration-200"
+                                        class="btn btn-sm flex items-center gap-1 bg-transparent text-[#111e60] hover:bg-[#111e60]/10 border border-transparent hover:border-[#111e60]/30 dark:text-gray-300 dark:hover:bg-gray-700/30 dark:hover:border-gray-600 focus:ring-2 focus:ring-[#111e60]/20 dark:focus:ring-gray-600/20 transition-all duration-200 rounded px-3 py-1 text-sm"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
-                                        Limpiar Filtros
+                                        <span>Limpiar Filtros</span>
                                     </button>
                                 </div>
                             </div>
@@ -340,6 +357,10 @@ const openProfileDetails = (aspirante) => {
                                             </svg>
                                         </button>
                                     </th>
+                                    <!-- Nueva columna para Formación Académica -->
+                                    <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-[#111e60] uppercase tracking-wider dark:text-gray-300">
+                                        Formación
+                                    </th>
                                     <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-[#111e60] uppercase tracking-wider dark:text-gray-300">
                                         <button @click="sortBy('plazas.titulo')" class="flex items-center">
                                             Plaza
@@ -362,11 +383,9 @@ const openProfileDetails = (aspirante) => {
                                             </svg>
                                         </button>
                                     </th>
+                                    <!-- Columna combinada de estados -->
                                     <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-[#111e60] uppercase tracking-wider dark:text-gray-300">
-                                        Estado Sistema
-                                    </th>
-                                    <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-[#111e60] uppercase tracking-wider dark:text-gray-300">
-                                        Estado Admin
+                                        Estado
                                     </th>
                                     <th scope="col" class="px-6 py-3.5 text-center text-xs font-semibold text-[#111e60] uppercase tracking-wider dark:text-gray-300">
                                         Acciones
@@ -386,9 +405,22 @@ const openProfileDetails = (aspirante) => {
                                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             {{ aplicacion.aspirante?.email }}
                                         </div>
-                                        <div class="text-xs flex items-center mt-1 space-x-2">
-                                            <span class="badge badge-sm badge-ghost">{{ aplicacion.aspirante?.nivelAcademico?.nombre }}</span>
-                                            <span class="badge badge-sm badge-ghost">{{ aplicacion.aspirante?.experiencia?.nombre }}</span>
+                                    </td>
+                                    <!-- Nueva celda para Formación Académica -->
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1 text-xs">
+                                            <div class="flex items-center">
+                                                <span class="font-medium text-gray-700 dark:text-gray-300 mr-1">Nivel:</span>
+                                                <span class="text-gray-600 dark:text-gray-400">{{ aplicacion.aspirante?.nivelAcademico?.nombre || 'No especificado' }}</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <span class="font-medium text-gray-700 dark:text-gray-300 mr-1">Estado:</span>
+                                                <span class="text-gray-600 dark:text-gray-400">{{ aplicacion.aspirante?.estadoAcademico?.nombre || 'No especificado' }}</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <span class="font-medium text-gray-700 dark:text-gray-300 mr-1">Experiencia:</span>
+                                                <span class="text-gray-600 dark:text-gray-400">{{ aplicacion.aspirante?.experiencia?.nombre || 'No especificado' }}</span>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
@@ -399,37 +431,44 @@ const openProfileDetails = (aspirante) => {
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         {{ new Date(aplicacion.fecha_aplicacion).toLocaleString() }}
                                     </td>
+                                    <!-- Celda combinada de estados -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span 
-                                            class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                            :class="{
-                                                'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200': aplicacion.id_estado_aplicacion === 3,
-                                                'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200': aplicacion.id_estado_aplicacion === 4
-                                            }"
-                                        >
-                                            {{ aplicacion.estado?.nombre }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <select 
-                                            v-model="aplicacion.id_estado_admin_aplicacion"
-                                            @change="updateEstadoAdmin(aplicacion.id_aplicacion, aplicacion.id_estado_admin_aplicacion)"
-                                            class="select select-bordered select-sm w-full max-w-xs"
-                                            :class="{
-                                                'bg-green-50 border-green-500 text-green-800 dark:bg-green-900/30 dark:text-green-200': aplicacion.id_estado_admin_aplicacion === 1,
-                                                'bg-red-50 border-red-500 text-red-800 dark:bg-red-900/30 dark:text-red-200': aplicacion.id_estado_admin_aplicacion === 2,
-                                                'bg-gray-50 border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300': !aplicacion.id_estado_admin_aplicacion
-                                            }"
-                                        >
-                                            <option value="">-- Seleccionar --</option>
-                                            <option 
-                                                v-for="estado in estados.filter(e => e.id <= 2)" 
-                                                :key="estado.id" 
-                                                :value="estado.id"
-                                            >
-                                                {{ estado.nombre }}
-                                            </option>
-                                        </select>
+                                        <div class="flex flex-col space-y-3">
+                                            <!-- Estado del sistema -->
+                                            <div class="flex items-center">
+                                                <span class="text-xs font-medium text-gray-600 dark:text-gray-400 mr-2">Sistema:</span>
+                                                <span 
+                                                    class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                                    :class="getEstadoClass(aplicacion.id_estado_aplicacion)"
+                                                >
+                                                    {{ aplicacion.estado?.nombre }}
+                                                </span>
+                                            </div>
+                                            
+                                            <!-- Estado administrativo -->
+                                            <div class="flex items-center">
+                                                <span class="text-xs font-medium text-gray-600 dark:text-gray-400 mr-2">Admin:</span>
+                                                <select 
+                                                    v-model="aplicacion.id_estado_admin_aplicacion"
+                                                    @change="updateEstadoAdmin(aplicacion.id_aplicacion, aplicacion.id_estado_admin_aplicacion)"
+                                                    class="select select-bordered select-sm w-40 h-8 min-h-8 max-w-xs"
+                                                    :class="{
+                                                        'bg-green-50 border-green-500 text-green-800 dark:bg-green-900/30 dark:text-green-200': aplicacion.id_estado_admin_aplicacion === 1,
+                                                        'bg-red-50 border-red-500 text-red-800 dark:bg-red-900/30 dark:text-red-200': aplicacion.id_estado_admin_aplicacion === 2,
+                                                        'bg-gray-50 border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300': !aplicacion.id_estado_admin_aplicacion
+                                                    }"
+                                                >
+                                                    <option value="">-- Pendiente --</option>
+                                                    <option 
+                                                        v-for="estado in estados.filter(e => e.id <= 2)" 
+                                                        :key="estado.id" 
+                                                        :value="estado.id"
+                                                    >
+                                                        {{ estado.nombre }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <div class="flex justify-center space-x-2">
@@ -451,7 +490,7 @@ const openProfileDetails = (aspirante) => {
                                                 class="inline-flex items-center px-2.5 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded-md text-xs font-medium dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 transition duration-150"
                                                 title="Ver CV"
                                             >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
                                                 Ver CV
@@ -505,162 +544,19 @@ const openProfileDetails = (aspirante) => {
             </div>
         </div>
 
-        <!-- Modal de Vista Previa de CV -->
-        <div v-if="showCVModal" class="fixed inset-0 overflow-y-auto z-50">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Fondo oscuro -->
-                <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="showCVModal = false">
-                    <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-80"></div>
-                </div>
+        <!-- Componentes de modales -->
+        <VerCVModal 
+            v-if="showCVModal"
+            :url="currentCVUrl"
+            :aspirante="currentAspirante"
+            @close="closeModals"
+        />
 
-                <!-- Contenido del modal -->
-                <div class="inline-block align-bottom bg-white dark:bg-[#303844] rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
-                    <!-- Encabezado del modal -->
-                    <div class="bg-gray-50 dark:bg-[#2c3340] px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <h3 class="text-lg font-medium text-[#111e60] dark:text-white">
-                            CV de {{ currentAspirante?.nombre_completo }}
-                        </h3>
-                        <button @click="showCVModal = false" class="btn btn-sm btn-circle btn-ghost">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Cuerpo del modal con visor de PDF -->
-                    <div class="p-0 bg-gray-100 dark:bg-gray-800 h-[70vh]">
-                        <iframe 
-                            :src="currentCVUrl" 
-                            class="w-full h-full border-0"
-                            frameborder="0"
-                        ></iframe>
-                    </div>
-                    
-                    <!-- Pie del modal -->
-                    <div class="bg-gray-50 dark:bg-[#2c3340] px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-                        <a :href="currentCVUrl" download class="btn btn-sm bg-[#111e60] hover:bg-[#0c1547] text-white border-none mr-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Descargar
-                        </a>
-                        <button @click="showCVModal = false" class="btn btn-sm btn-outline">
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal de Detalles del Perfil del Aspirante -->
-        <div v-if="showProfileModal" class="fixed inset-0 overflow-y-auto z-50">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Fondo oscuro -->
-                <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="showProfileModal = false">
-                    <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-80"></div>
-                </div>
-
-                <!-- Contenido del modal -->
-                <div class="inline-block align-bottom bg-white dark:bg-[#303844] rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                    <!-- Encabezado del modal -->
-                    <div class="bg-gray-50 dark:bg-[#2c3340] px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <h3 class="text-lg font-medium text-[#111e60] dark:text-white">
-                            Perfil de Aspirante
-                        </h3>
-                        <button @click="showProfileModal = false" class="btn btn-sm btn-circle btn-ghost">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Cuerpo del modal con la información del perfil -->
-                    <div class="p-6 max-h-[70vh] overflow-y-auto">
-                        <div v-if="selectedAspirante" class="space-y-6">
-                            <!-- Información personal -->
-                            <div class="bg-gray-50 dark:bg-[#2c3340]/50 p-4 rounded-lg">
-                                <h4 class="font-medium text-[#111e60] dark:text-white text-lg mb-3">Información Personal</h4>
-                                
-                                <div class="space-y-3">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre completo</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.nombre_completo }}</p>
-                                        </div>
-                                        
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">DUI</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.dui_aspirante }}</p>
-                                        </div>
-                                        
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Correo electrónico</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.email }}</p>
-                                        </div>
-                                        
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Teléfono</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.telefono }}</p>
-                                        </div>
-                                        
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Género</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.genero === 'M' ? 'Masculino' : 'Femenino' }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Formación académica -->
-                            <div class="bg-gray-50 dark:bg-[#2c3340]/50 p-4 rounded-lg">
-                                <h4 class="font-medium text-[#111e60] dark:text-white text-lg mb-3">Formación Académica</h4>
-                                
-                                <div class="space-y-3">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Nivel académico</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.nivelAcademico?.nombre }}</p>
-                                        </div>
-                                        
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Estado académico</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.estadoAcademico?.nombre }}</p>
-                                        </div>
-                                        
-                                        <div>
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Carrera</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.carrera }}</p>
-                                        </div>
-                                        
-                                        <div v-if="selectedAspirante.especialidad">
-                                            <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Especialidad</h5>
-                                            <p class="text-gray-900 dark:text-white">{{ selectedAspirante.especialidad }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Experiencia -->
-                            <div class="bg-gray-50 dark:bg-[#2c3340]/50 p-4 rounded-lg">
-                                <h4 class="font-medium text-[#111e60] dark:text-white text-lg mb-3">Experiencia</h4>
-                                
-                                <div>
-                                    <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Nivel de experiencia</h5>
-                                    <p class="text-gray-900 dark:text-white">{{ selectedAspirante.experiencia?.nombre }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Pie del modal -->
-                    <div class="bg-gray-50 dark:bg-[#2c3340] px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-                        <button @click="showProfileModal = false" class="btn btn-sm btn-outline">
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <PerfilAspiranteModal
+            v-if="showProfileModal"
+            :aspirante="selectedAspirante"
+            @close="closeModals"
+        />
     </AuthenticatedLayout>
 </template>
 
@@ -712,5 +608,13 @@ tr:hover {
 
 .btn:active, a:active {
     transform: translateY(0);
+}
+
+/* Fix para select en estado admin */
+.select-sm {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    height: auto;
+    min-height: 2rem;
 }
 </style>

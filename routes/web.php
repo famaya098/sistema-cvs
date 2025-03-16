@@ -34,6 +34,7 @@ Route::middleware('guest:admin')->group(function () {
     Route::post('/bcr-admin', [AdminAuthController::class, 'login']);
 });
 
+// Rutas para administradores (panel de administración)
 Route::middleware('admin')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
     
@@ -50,11 +51,7 @@ Route::middleware('admin')->group(function () {
         ->name('admin.aplicaciones.index');
     Route::patch('/admin/aplicaciones/{id}/estado', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'updateEstadoAdmin'])
         ->name('admin.aplicaciones.updateEstado');
-
-    Route::get('/admin/aplicaciones/{id}', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'show'])
-        ->name('admin.aplicaciones.show');
-
-        Route::get('/admin/aplicaciones/{id}/cv', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'downloadCV'])
+    Route::get('/admin/aplicaciones/{id}/cv', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'downloadCV'])
         ->name('admin.aplicaciones.download.cv');
 });
 

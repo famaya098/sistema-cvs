@@ -71,6 +71,7 @@ class AplicacionesAdminController extends Controller
         
         $query->orderBy($sortField, $sortDirection);
         
+        // Paginación (ahora usamos 10 elementos por página para evitar scroll excesivo)
         $aplicaciones = $query->paginate(10);
         
         // Obtener datos para filtros
@@ -112,31 +113,31 @@ class AplicacionesAdminController extends Controller
     }
     
     /**
- * Ver CV de un aspirante
- */
-public function downloadCV($id)
-{
-    $aplicacion = Aplicacion::with('documento')->findOrFail($id);
-    
-    if (!$aplicacion->documento) {
-        return redirect()->back()->with('error', 'No se encontró el CV para visualizar');
-    }
-    
-    // Ruta del archivo
-    $filePath = $aplicacion->documento->ruta;
-    
-    try {
-        // Obtener el contenido del archivo desde S3
-        $fileContents = \Storage::disk('s3')->get($filePath);
+     * Ver CV de un aspirante
+     */
+    public function downloadCV($id)
+    {
+        $aplicacion = Aplicacion::with('documento')->findOrFail($id);
         
-        // Devolver el contenido como respuesta inline PDF
-        return response($fileContents, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $aplicacion->aspirante->nombre_completo . '_CV.pdf"',
-        ]);
-    } catch (\Exception $e) {
-        \Log::error('Error al obtener CV: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'Error al visualizar el CV. Por favor, intente nuevamente más tarde.');
+        if (!$aplicacion->documento) {
+            return redirect()->back()->with('error', 'No se encontró el CV para visualizar');
+        }
+        
+        // Ruta del archivo
+        $filePath = $aplicacion->documento->ruta;
+        
+        try {
+            // Obtener el contenido del archivo desde S3
+            $fileContents = \Storage::disk('s3')->get($filePath);
+            
+            // Devolver el contenido como respuesta inline PDF
+            return response($fileContents, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $aplicacion->aspirante->nombre_completo . '_CV.pdf"',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error al obtener CV: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al visualizar el CV. Por favor, intente nuevamente más tarde.');
+        }
     }
-}
 }
