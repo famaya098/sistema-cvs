@@ -55,7 +55,7 @@ const logoutRoute = computed(() => isAdmin.value ? 'admin.logout' : 'logout');
 
                                 <!-- nav de aplicacion de plazas -->
                                 <NavLink :href="route('admin.aplicaciones.index')" :active="route().current('admin.aplicaciones.*')">
-                                    Aplicaciones
+                                    Gestión de Aplicaciones
                                 </NavLink>
                             </div>
                         </div>

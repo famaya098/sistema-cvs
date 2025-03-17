@@ -123,11 +123,35 @@ const closeModals = () => {
 
 // Formateador para mostrar el estado de la aplicación de forma clara
 const getEstadoClass = (estadoId) => {
-    if (estadoId === 1) return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'; // Aprobado
-    if (estadoId === 2) return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400'; // Rechazado
-    if (estadoId === 3) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300'; // Cumple
-    if (estadoId === 4) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200'; // No cumple
-    return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'; // Por defecto
+    switch(estadoId) {
+        case 1: // Aprobado
+            return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200';
+        case 2: // Rechazado
+            return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400';
+        case 3: // Cumple
+            return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200';
+        case 4: // No cumple
+            return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200';
+        case 5: // Pendiente
+            return 'bg-gray-100 text-gray-800 dark:bg-gray-700/50 dark:text-gray-300';
+        default:
+            return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    }
+};
+
+const getEstadoSelectClass = (estadoId) => {
+    if (!estadoId) return 'bg-gray-100 border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'; // Pendiente
+    
+    switch(parseInt(estadoId)) {
+        case 1: // Aprobado
+            return 'bg-green-50 border-green-500 text-green-800 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700';
+        case 2: // Rechazado
+            return 'bg-red-50 border-red-500 text-red-800 dark:bg-red-900/30 dark:text-red-200 dark:border-red-700';
+        case 5: // Pendiente (explícito)
+            return 'bg-gray-100 border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300';
+        default:
+            return 'bg-gray-100 border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300';
+    }
 };
 </script>
 
@@ -222,7 +246,7 @@ const getEstadoClass = (estadoId) => {
                                             >
                                                 <option value="">Todos los estados</option>
                                                 <option 
-                                                    v-for="estado in estados" 
+                                                    v-for="estado in estados.filter(e => e.id === 3 || e.id === 4)" 
                                                     :key="estado.id"
                                                     :value="estado.id"
                                                 >
@@ -243,9 +267,9 @@ const getEstadoClass = (estadoId) => {
                                                 class="select select-bordered w-full bg-white dark:bg-[#2c3340] dark:text-white border-gray-300 dark:border-gray-600 focus:border-[#111e60] focus:ring-2 focus:ring-[#111e60]/20 dark:focus:border-[#363d4d] dark:focus:ring-[#363d4d]/20 transition duration-200 pr-10"
                                             >
                                                 <option value="">Todos los estados</option>
-                                                <option value="null">Pendiente de revisión</option>
+                                                <!-- <option value="null">Sin asignar</option> -->
                                                 <option 
-                                                    v-for="estado in estados" 
+                                                    v-for="estado in estados.filter(e => e.id === 1 || e.id === 2 || e.id === 5)" 
                                                     :key="estado.id"
                                                     :value="estado.id"
                                                 >
@@ -408,18 +432,21 @@ const getEstadoClass = (estadoId) => {
                                     </td>
                                     <!-- Nueva celda para Formación Académica -->
                                     <td class="px-6 py-4">
-                                        <div class="space-y-1 text-xs">
-                                            <div class="flex items-center">
-                                                <span class="font-medium text-gray-700 dark:text-gray-300 mr-1">Nivel:</span>
-                                                <span class="text-gray-600 dark:text-gray-400">{{ aplicacion.aspirante?.nivelAcademico?.nombre || 'No especificado' }}</span>
+                                        <div class="space-y-2 text-xs">
+                                            <div class="rounded-md bg-blue-50 dark:bg-blue-900/20 px-2 py-1 inline-flex items-center">
+                                                <span class="text-blue-700 dark:text-blue-300 whitespace-nowrap">
+                                                    {{ aplicacion.aspirante?.nivel_academico?.nombre || 'Sin nivel académico' }}
+                                                </span>
                                             </div>
-                                            <div class="flex items-center">
-                                                <span class="font-medium text-gray-700 dark:text-gray-300 mr-1">Estado:</span>
-                                                <span class="text-gray-600 dark:text-gray-400">{{ aplicacion.aspirante?.estadoAcademico?.nombre || 'No especificado' }}</span>
+                                            <div class="rounded-md bg-purple-50 dark:bg-purple-900/20 px-2 py-1 inline-flex items-center">
+                                                <span class="text-purple-700 dark:text-purple-300 whitespace-nowrap">
+                                                    {{ aplicacion.aspirante?.estado_academico?.nombre || 'Sin estado académico' }}
+                                                </span>
                                             </div>
-                                            <div class="flex items-center">
-                                                <span class="font-medium text-gray-700 dark:text-gray-300 mr-1">Experiencia:</span>
-                                                <span class="text-gray-600 dark:text-gray-400">{{ aplicacion.aspirante?.experiencia?.nombre || 'No especificado' }}</span>
+                                            <div class="rounded-md bg-teal-50 dark:bg-teal-900/20 px-2 py-1 inline-flex items-center">
+                                                <span class="text-teal-700 dark:text-teal-300 whitespace-nowrap">
+                                                    {{ aplicacion.aspirante?.experiencia?.nombre || 'Sin experiencia' }}
+                                                </span>
                                             </div>
                                         </div>
                                     </td>
@@ -451,16 +478,12 @@ const getEstadoClass = (estadoId) => {
                                                 <select 
                                                     v-model="aplicacion.id_estado_admin_aplicacion"
                                                     @change="updateEstadoAdmin(aplicacion.id_aplicacion, aplicacion.id_estado_admin_aplicacion)"
-                                                    class="select select-bordered select-sm w-40 h-8 min-h-8 max-w-xs"
-                                                    :class="{
-                                                        'bg-green-50 border-green-500 text-green-800 dark:bg-green-900/30 dark:text-green-200': aplicacion.id_estado_admin_aplicacion === 1,
-                                                        'bg-red-50 border-red-500 text-red-800 dark:bg-red-900/30 dark:text-red-200': aplicacion.id_estado_admin_aplicacion === 2,
-                                                        'bg-gray-50 border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300': !aplicacion.id_estado_admin_aplicacion
-                                                    }"
+                                                    class="select select-sm max-w-xs h-8 rounded-full text-xs font-medium border px-2.5 py-1.5"
+                                                    :class="getEstadoSelectClass(aplicacion.id_estado_admin_aplicacion)"
                                                 >
-                                                    <option value="">-- Pendiente --</option>
+                                                    <!-- <option value=""></option> -->
                                                     <option 
-                                                        v-for="estado in estados.filter(e => e.id <= 2)" 
+                                                        v-for="estado in estados.filter(e => e.id <= 2 || e.id === 5)" 
                                                         :key="estado.id" 
                                                         :value="estado.id"
                                                     >
@@ -472,10 +495,9 @@ const getEstadoClass = (estadoId) => {
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <div class="flex justify-center space-x-2">
-                                            <!-- Ver perfil del aspirante -->
                                             <button 
                                                 @click="openProfileDetails(aplicacion.aspirante)"
-                                                class="inline-flex items-center px-2.5 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-md text-xs font-medium dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-800/50 transition duration-150"
+                                                class="inline-flex items-center px-2.5 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md text-xs font-medium dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-800/50 transition duration-150"
                                                 title="Ver perfil del aspirante"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -484,10 +506,9 @@ const getEstadoClass = (estadoId) => {
                                                 Perfil
                                             </button>
                                             
-                                            <!-- Ver CV -->
                                             <button 
                                                 @click="openCVPreview(aplicacion)"
-                                                class="inline-flex items-center px-2.5 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded-md text-xs font-medium dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 transition duration-150"
+                                                class="inline-flex items-center px-2.5 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-md text-xs font-medium dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 transition duration-150"
                                                 title="Ver CV"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

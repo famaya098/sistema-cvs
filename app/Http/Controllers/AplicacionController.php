@@ -111,6 +111,7 @@ class AplicacionController extends Controller
             // Asignar estado según si cumple o no con los requisitos
             $aplicacion->id_estado_aplicacion = $cumpleRequisitos ? 3 : 4; // 3: Cumple, 4: No Cumple según sistema
             // El estado según administrador quedará nulo hasta que un administrador lo revise
+            $aplicacion->id_estado_admin_aplicacion = 5; // 5: Pendiente de revisión por administrador
             $aplicacion->save();
             
             DB::commit();

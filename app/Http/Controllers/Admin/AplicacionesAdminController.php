@@ -20,6 +20,7 @@ class AplicacionesAdminController extends Controller
     public function index(Request $request)
     {
         $query = Aplicacion::with([
+            'aspirante', 
             'aspirante.nivelAcademico', 
             'aspirante.estadoAcademico',
             'aspirante.experiencia',
@@ -30,7 +31,11 @@ class AplicacionesAdminController extends Controller
         ])
         ->join('usuario_perfil', 'aplicaciones.id_aspirante', '=', 'usuario_perfil.id_aspirante')
         ->join('plazas', 'aplicaciones.id_plaza', '=', 'plazas.id_plaza')
+        ->leftJoin('niveles_academicos', 'usuario_perfil.id_nivel_academico', '=', 'niveles_academicos.id')
+        ->leftJoin('estados_academicos', 'usuario_perfil.id_estado_academico', '=', 'estados_academicos.id')
         ->select('aplicaciones.*');
+        
+        
         
         // Aplicar filtros si existen
         if ($request->filled('search')) {
@@ -73,6 +78,15 @@ class AplicacionesAdminController extends Controller
         
         // Paginación (ahora usamos 10 elementos por página para evitar scroll excesivo)
         $aplicaciones = $query->paginate(10);
+
+        foreach ($aplicaciones as $aplicacion) {
+            \Log::info('Aspirante: ' . $aplicacion->aspirante->nombre_completo);
+            \Log::info('Nivel Académico ID: ' . $aplicacion->aspirante->id_nivel_academico);
+            \Log::info('Nivel Académico Objeto: ' . json_encode($aplicacion->aspirante->nivelAcademico));
+            \Log::info('Estado Académico ID: ' . $aplicacion->aspirante->id_estado_academico);
+            \Log::info('Estado Académico Objeto: ' . json_encode($aplicacion->aspirante->estadoAcademico));
+            \Log::info('Experiencia Objeto: ' . json_encode($aplicacion->aspirante->experiencia));
+        }
         
         // Obtener datos para filtros
         $plazas = Plaza::where('estado', true)->get(['id_plaza', 'titulo']);

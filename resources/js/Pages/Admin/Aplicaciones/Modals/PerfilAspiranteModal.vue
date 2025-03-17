@@ -90,6 +90,7 @@ const obtenerGenero = (genero) => {
                             </div>
                         </div>
                     </div>
+                    <!-- <pre>{{ JSON.stringify(aspirante, null, 2) }}</pre> -->
                     
                     <!-- Formación académica -->
                     <div class="bg-gray-50 dark:bg-[#2c3340]/60 rounded-xl p-5">
@@ -106,12 +107,13 @@ const obtenerGenero = (genero) => {
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Nivel académico</h5>
-                                    <p class="text-[#111e60] dark:text-white">{{ aspirante.nivelAcademico?.nombre || 'No especificado' }}</p>
+                                    <p class="text-[#111e60] dark:text-white">{{ aspirante.nivel_academico?.nombre || 'No especificado' }}</p>
+
                                 </div>
                                 
                                 <div>
                                     <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Estado académico</h5>
-                                    <p class="text-[#111e60] dark:text-white">{{ aspirante.estadoAcademico?.nombre || 'No especificado' }}</p>
+                                    <p class="text-[#111e60] dark:text-white">{{ aspirante.estado_academico?.nombre || 'No especificado' }}</p>
                                 </div>
                                 
                                 <div>

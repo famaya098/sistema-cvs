@@ -211,7 +211,7 @@ const toggleFilters = () => {
                                 <div class="flex justify-end">
                                     <button 
                                         @click="clearFilters"
-                                        class="btn btn-sm btn-outline text-[#111e60] hover:bg-[#111e60]/10 hover:border-[#111e60] dark:text-gray-300 dark:hover:bg-gray-700 flex items-center gap-1 transition-all duration-200"
+                                        class="btn btn-sm flex items-center gap-1 bg-transparent text-[#111e60] hover:bg-[#111e60]/10 border border-transparent hover:border-[#111e60]/30 dark:text-gray-300 dark:hover:bg-gray-700/30 dark:hover:border-gray-600 focus:ring-2 focus:ring-[#111e60]/20 dark:focus:ring-gray-600/20 transition-all duration-200 rounded px-3 py-1 text-sm"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
