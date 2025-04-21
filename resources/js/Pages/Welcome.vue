@@ -117,6 +117,11 @@ onMounted(() => {
                                             @click="showUserMenu = false">
                                             Mi Perfil
                                         </Link>
+                                        <Link :href="route('aspirante.aplicaciones')" 
+                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            @click="showUserMenu = false">
+                                            Mis Aplicaciones
+                                        </Link>
                                         <Link :href="route('logout')" method="post" as="button"
                                             class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                             @click="showUserMenu = false">
@@ -243,7 +248,7 @@ onMounted(() => {
                                     </span>
                                     
                                     <button class="px-4 py-2 text-sm font-medium text-white bg-[#363d4d] hover:bg-[#2c3340] rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#363d4d] disabled:opacity-50 dark:focus:ring-offset-gray-800">
-                                        Ver Detalless
+                                        Ver Detalles
                                     </button>
                                 </div>
                             </div>

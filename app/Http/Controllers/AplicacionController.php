@@ -12,6 +12,7 @@ use App\Models\NivelExperiencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class AplicacionController extends Controller
 {
@@ -150,6 +151,35 @@ class AplicacionController extends Controller
         return response()->json([
             'aplicado' => !!$aplicacion,
             'aplicacion' => $aplicacion
+        ]);
+    }
+
+    /**
+     * Mostrar las aplicaciones del aspirante autenticado
+     */
+    public function misAplicaciones()
+    {
+        $user = Auth::user();
+        $perfil = UsuarioPerfil::where('user_id', $user->id)->first();
+        
+        if (!$perfil) {
+            return redirect()->route('aspirante.perfil')->with('error', 'Debe completar su perfil antes de ver sus aplicaciones');
+        }
+        
+        // Obtener todas las aplicaciones del aspirante con sus relaciones
+        $aplicaciones = Aplicacion::with([
+            'plaza', 
+            'plaza.seccion', 
+            'plaza.categoria', 
+            'estado', 
+            'estadoAdmin'
+        ])
+        ->where('id_aspirante', $perfil->id_aspirante)
+        ->orderBy('fecha_aplicacion', 'desc')
+        ->get();
+            
+        return Inertia::render('Aspirante/MisAplicaciones', [
+            'aplicaciones' => $aplicaciones
         ]);
     }
 }

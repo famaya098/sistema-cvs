@@ -32,7 +32,7 @@ const logoutRoute = computed(() => isAdmin.value ? 'admin.logout' : 'logout');
                             <div class="flex shrink-0 items-center">
                                 <Link :href="route('dashboard')">
                                     <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200"
+                                        class="block h-14 w-14 fill-current text-gray-800 dark:text-gray-200"
                                     />
                                 </Link>
                             </div>
@@ -56,6 +56,15 @@ const logoutRoute = computed(() => isAdmin.value ? 'admin.logout' : 'logout');
                                 <!-- nav de aplicacion de plazas -->
                                 <NavLink :href="route('admin.aplicaciones.index')" :active="route().current('admin.aplicaciones.*')">
                                     Gestión de Aplicaciones
+                                </NavLink>
+
+                                <!-- nav de gestion aspirantes -->
+
+                                <NavLink 
+                                    :href="route('admin.aspirantes.index')" 
+                                    :active="route().current('admin.aspirantes.*')"
+                                >
+                                    Gestión de Aspirantes
                                 </NavLink>
                             </div>
                         </div>

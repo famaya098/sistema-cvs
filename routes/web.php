@@ -53,6 +53,12 @@ Route::middleware('admin')->group(function () {
         ->name('admin.aplicaciones.updateEstado');
     Route::get('/admin/aplicaciones/{id}/cv', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'downloadCV'])
         ->name('admin.aplicaciones.download.cv');
+
+    // Rutas para gestionar aspirantes
+    Route::get('/admin/aspirantes', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'aspirantes'])
+    ->name('admin.aspirantes.index');
+    Route::get('/admin/aspirantes/{id}/cv', [App\Http\Controllers\Admin\AplicacionesAdminController::class, 'verCV'])
+    ->name('admin.aspirantes.cv');
 });
 
 // Ruta pública para ver detalles de una plaza
@@ -80,6 +86,9 @@ Route::middleware(['auth:web'])->group(function () {
         ->name('aplicaciones.aplicar');
     Route::get('/plazas/{plaza}/verificar-aplicacion', [App\Http\Controllers\AplicacionController::class, 'verificarAplicacion'])
         ->name('aplicaciones.verificar');
+
+    Route::get('/mis-aplicaciones', [App\Http\Controllers\AplicacionController::class, 'misAplicaciones'])
+    ->name('aspirante.aplicaciones');
 });
 
 // Rutas para el registro extendido de aspirantes

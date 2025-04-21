@@ -12,6 +12,10 @@ use App\Models\NivelExperiencia;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use App\Models\UsuarioPerfil;
+use App\Models\UsuarioDocumento;
+
+
 class AplicacionesAdminController extends Controller
 {
     /**
@@ -148,6 +152,99 @@ class AplicacionesAdminController extends Controller
             return response($fileContents, 200, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'inline; filename="' . $aplicacion->aspirante->nombre_completo . '_CV.pdf"',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error al obtener CV: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al visualizar el CV. Por favor, intente nuevamente más tarde.');
+        }
+    }
+    /**
+     * Mostrar lista de aspirantes registrados
+     */
+    public function aspirantes(Request $request)
+    {
+        $query = UsuarioPerfil::with([
+            'user',
+            'nivelAcademico', 
+            'estadoAcademico',
+            'experiencia',
+            'documentos.documento.tipoDocumento'
+        ]);
+        
+        // Aplicar filtros si existen
+        if ($request->filled('search')) {
+            $query->where('nombre_completo', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%')
+                ->orWhere('dui_aspirante', 'like', '%' . $request->search . '%');
+        }
+        
+        if ($request->filled('nivel_academico')) {
+            $query->where('id_nivel_academico', $request->nivel_academico);
+        }
+        
+        if ($request->filled('nivel_experiencia')) {
+            $query->where('id_experiencia', $request->nivel_experiencia);
+        }
+        
+        if ($request->filled('estado_academico')) {
+            $query->where('id_estado_academico', $request->estado_academico);
+        }
+        
+        // Ordenamiento
+        $sortField = $request->input('sort_field', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        
+        $query->orderBy($sortField, $sortDirection);
+        
+        // Paginación
+        $aspirantes = $query->paginate(10);
+        
+        // Obtener datos para filtros
+        $nivelesAcademicos = NivelAcademico::where('estado', true)->get();
+        $estadosAcademicos = EstadoAcademico::where('estado', true)->get();
+        $nivelesExperiencia = NivelExperiencia::where('estado', true)->get();
+        
+        return Inertia::render('Admin/Aspirantes/Index', [
+            'aspirantes' => $aspirantes,
+            'nivelesAcademicos' => $nivelesAcademicos,
+            'estadosAcademicos' => $estadosAcademicos,
+            'nivelesExperiencia' => $nivelesExperiencia,
+            'filters' => $request->all([
+                'search', 'nivel_academico', 'nivel_experiencia', 'estado_academico',
+                'sort_field', 'sort_direction'
+            ]),
+        ]);
+    }
+
+    /**
+     * Ver CV de un aspirante específico
+     */
+    public function verCV($id)
+    {
+        $aspirante = UsuarioPerfil::with('documentos.documento')->findOrFail($id);
+        
+        $cv = $aspirante->documentos()
+            ->whereHas('documento.tipoDocumento', function ($query) {
+                $query->where('nombre', 'Curriculum Vitae');
+            })
+            ->where('activo', true)
+            ->first();
+        
+        if (!$cv) {
+            return redirect()->back()->with('error', 'No se encontró el CV para visualizar');
+        }
+        
+        // Ruta del archivo
+        $filePath = $cv->documento->ruta;
+        
+        try {
+            // Obtener el contenido del archivo desde S3
+            $fileContents = \Storage::disk('s3')->get($filePath);
+            
+            // Devolver el contenido como respuesta inline PDF
+            return response($fileContents, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $aspirante->nombre_completo . '_CV.pdf"',
             ]);
         } catch (\Exception $e) {
             \Log::error('Error al obtener CV: ' . $e->getMessage());
